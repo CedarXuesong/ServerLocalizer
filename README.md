@@ -4,11 +4,11 @@
 [![Forge](https://img.shields.io/badge/Forge-11.15.1.2318-blue.svg)](https://files.minecraftforge.net)
 [![Release](https://img.shields.io/github/v/release/CedarXuesong/ServerLocalizer?include_prereleases&color=orange)](https://github.com/CedarXuesong/ServerLocalizer/releases)
 
-> 🎮 一个强大的 Minecraft 服务器内容本地化翻译模组，让您轻松畅玩国际服务器！
+> 🎮 一个强大的 Minecraft 服务器内容本地化AI翻译模组，让您轻松畅玩国际服务器！
 
 ## 📖 简介
 
-CedarServerLocalizer 是一个专为 Minecraft 1.8.9 开发的 Forge 模组，通过实时拦截服务器数据包与调用大语言模型 API，为玩家提供高质量、可定制的游戏内容翻译，帮助您克服语言障碍，享受无缝的国际服游戏体验。
+CedarServerLocalizer 是一个专为 Minecraft 1.8.9 开发的 Forge 模组，通过实时拦截服务器数据包与调用AI大语言模型 API，为玩家提供高质量、可定制的游戏内容翻译，帮助您克服语言障碍，享受无缝的国际服游戏体验。
 
 ## ✨ 功能特点
 
