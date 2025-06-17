@@ -6,6 +6,7 @@ import com.cedarxuesong.serverlocalizer.utils.ai.*;
 import com.cedarxuesong.serverlocalizer.utils.translation.ChatMessageCache;
 import com.cedarxuesong.serverlocalizer.utils.ai.ModConfig;
 import com.cedarxuesong.serverlocalizer.utils.mylog.mylog;
+import com.cedarxuesong.serverlocalizer.utils.Lang;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ChatLine;
 import net.minecraft.client.gui.GuiNewChat;
@@ -61,7 +62,7 @@ public class ChatTranslateCommand extends CommandBase {
                 showUsage(sender);
                 return;
             }else if (!ModConfig.getInstance().isChatTranslationEnabled()) {
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText("§c请打开翻译开关后重试！"));
+                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(Lang.translate("command.serverlocalizer.translate.disabled")));
                 return;
             }
 
@@ -99,11 +100,7 @@ public class ChatTranslateCommand extends CommandBase {
     }
 
     private void showUsage(ICommandSender sender) {
-        IChatComponent usageMessage = new ChatComponentText(
-                "§e=== 聊天翻译命令帮助 ===\n" +
-                "§b/serverlocalizer translate <messageId> §f- 翻译指定ID的聊天消息\n" +
-                "§7提示：点击聊天消息后的[T]标记可以快速翻译"
-                );
+        IChatComponent usageMessage = new ChatComponentText(Lang.translate("command.serverlocalizer.translate.usage"));
         sender.addChatMessage(usageMessage);
     }
     
@@ -117,7 +114,7 @@ public class ChatTranslateCommand extends CommandBase {
         String apiKey = config.getApiKey(CHATTRANSLATION_API);
 
         if (apiKey == null || apiKey.isEmpty()) {
-            return new OpenAIResponse(null, "§r§c密钥为空，请打开模组配置页面，配置ApiKey！", 400);
+            return new OpenAIResponse(null, Lang.translate("command.serverlocalizer.translate.api_key_empty"), 400);
         }
 
         try {
@@ -128,7 +125,7 @@ public class ChatTranslateCommand extends CommandBase {
             return OpenAIClient.sendRequestWithConfig(CHATTRANSLATION_API, messages);
         } catch (Exception e) {
             mylog.error(TAG, "调用翻译API时发生错误", e);
-            return new OpenAIResponse(null, "翻译过程中发生错误: " + e.getMessage(), 500);
+            return new OpenAIResponse(null, String.format(Lang.translate("command.serverlocalizer.translate.api_error"), e.getMessage()), 500);
         }
     }
     
@@ -236,7 +233,7 @@ public class ChatTranslateCommand extends CommandBase {
         GuiNewChat chatGUI = mc.ingameGUI.getChatGUI();
         
         // 创建加载消息
-        IChatComponent loadingMessage = new ChatComponentText("正在翻译中...");
+        IChatComponent loadingMessage = new ChatComponentText(Lang.translate("command.serverlocalizer.translate.translating"));
         loadingMessage.getChatStyle().setColor(EnumChatFormatting.GRAY);
         
         // 存储消息ID和加载消息的映射关系
@@ -252,14 +249,14 @@ public class ChatTranslateCommand extends CommandBase {
                 translationExecutor.submit(() -> {
                     try {
                         OpenAIResponse response = translateTextWithUsage(originalText);
-                        String translatedText = "§c翻译失败";
+                        String translatedText = Lang.translate("command.serverlocalizer.translate.failed");
                         Usage usage = null;
 
                         if (response.isSuccess()) {
                             translatedText = cleanTranslationOutput(response.extractMessageContent());
                             usage = response.getUsage();
                         } else {
-                            translatedText = "§c翻译失败: " + response.getError();
+                            translatedText = String.format(Lang.translate("command.serverlocalizer.translate.failed_with_error"), response.getError());
                         }
 
                         IChatComponent translatedMessage = new ChatComponentText(translatedText);
@@ -307,7 +304,7 @@ public class ChatTranslateCommand extends CommandBase {
         GuiNewChat chatGUI = mc.ingameGUI.getChatGUI();
 
         // 初始状态显示 "连接中..."
-        IChatComponent connectingMessage = new ChatComponentText("§e连接中...");
+        IChatComponent connectingMessage = new ChatComponentText(Lang.translate("command.serverlocalizer.translate.connecting"));
         if (replaceMessageInChatLines(chatGUI, originalMessage, connectingMessage)) {
             refreshChatWithScroll(chatGUI);
             messageComponentToReplaceMap.put(messageId, connectingMessage);
@@ -336,7 +333,7 @@ public class ChatTranslateCommand extends CommandBase {
                             isThinking[0] = true;
                         }
                         // 更新思考中的Token计数
-                        String thinkingText = "§e思考中... Tokens: " + fullText.length() + " §n§l查看思考内容§r                ";
+                        String thinkingText = String.format(Lang.translate("command.serverlocalizer.translate.thinking"), fullText.length());
                         newComp = new ChatComponentText(thinkingText);
 
                         // 提取思考内容并创建悬浮事件
@@ -408,14 +405,14 @@ public class ChatTranslateCommand extends CommandBase {
     private void handleTranslationError(String messageId, String errorMessageStr, IChatComponent componentToReplace) {
         Minecraft.getMinecraft().addScheduledTask(() -> {
             if (componentToReplace != null) {
-                IChatComponent errorMessage = new ChatComponentText("§c翻译失败: " + errorMessageStr);
+                IChatComponent errorMessage = new ChatComponentText(String.format(Lang.translate("command.serverlocalizer.translate.failed_with_error"), errorMessageStr));
                 
                 if (replaceMessageInChatLines(Minecraft.getMinecraft().ingameGUI.getChatGUI(), componentToReplace, errorMessage)) {
                     refreshChatWithScroll(Minecraft.getMinecraft().ingameGUI.getChatGUI());
                 }
             } else {
                  // 如果找不到要替换的组件，直接打印错误信息
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText("§c翻译失败 (ID: " + messageId + "): " + errorMessageStr));
+                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(String.format(Lang.translate("command.serverlocalizer.translate.failed_with_id"), messageId, errorMessageStr)));
             }
             translatingMessages.remove(messageId);
             messageComponentToReplaceMap.remove(messageId);

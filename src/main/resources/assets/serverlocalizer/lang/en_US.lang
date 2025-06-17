@@ -1,0 +1,88 @@
+# General
+gui.serverlocalizer.save=Save
+gui.serverlocalizer.cancel=Cancel
+gui.serverlocalizer.reset=Reset
+gui.serverlocalizer.title=ServerLocalizer Configuration
+
+# Categories
+gui.serverlocalizer.category.project_info=Project Info
+gui.serverlocalizer.category.item_translation=Item Translation
+gui.serverlocalizer.category.chat_translation=Chat Translation
+gui.serverlocalizer.category.developer_options=Developer Options
+
+# Tooltips
+gui.serverlocalizer.tooltip.project_info=View basic information, features, and author of the mod.
+gui.serverlocalizer.tooltip.item_translation=Configure all options related to item name and description translation.
+gui.serverlocalizer.tooltip.chat_translation=Configure all options related to chat content translation.
+gui.serverlocalizer.tooltip.developer_options=Configure debugging and development features of the mod.
+gui.serverlocalizer.tooltip.save=Save all changes and close the interface.
+gui.serverlocalizer.tooltip.cancel=Discard all unsaved changes and close the interface.
+gui.serverlocalizer.tooltip.reset=Reset all settings on the interface to their last saved state.
+
+# Developer Options Panel
+gui.serverlocalizer.developer.debug_window=Debug Window:
+gui.serverlocalizer.developer.debug_window.tooltip.line1=§eDebug Window
+gui.serverlocalizer.developer.debug_window.tooltip.line2=If enabled, a real-time log window will be displayed
+gui.serverlocalizer.developer.debug_window.tooltip.line3=for development and troubleshooting.
+gui.serverlocalizer.developer.debug_window.tooltip.line4=§cRequires a game restart to take effect.
+
+# Item Translation Panel
+gui.serverlocalizer.item.title=Item Translation
+gui.serverlocalizer.item.enable=Item Translation:
+gui.serverlocalizer.item.enable_name=Translate Name:
+gui.serverlocalizer.item.enable_lore=Translate Lore:
+gui.serverlocalizer.item.tooltip.enable=Enable or disable all item (name and lore) translation features.
+gui.serverlocalizer.item.tooltip.enable_name=Control the translation of item names individually.
+gui.serverlocalizer.item.tooltip.enable_lore=Control the translation of item lores (descriptions) individually.
+gui.serverlocalizer.item.token_usage=Accumulated Tokens:
+
+# Chat Translation Panel
+gui.serverlocalizer.chat.title=Chat Translation
+gui.serverlocalizer.chat.enable=Chat Translation:
+gui.serverlocalizer.chat.enable_stream=Stream Response:
+gui.serverlocalizer.chat.tooltip.enable=Enable or disable all chat content translation features.
+gui.serverlocalizer.chat.tooltip.enable_stream=When enabled, translation results are displayed word by word without waiting for the full response, providing real-time interaction.
+
+# Common API Settings
+gui.serverlocalizer.api.base_url=Base URL:
+gui.serverlocalizer.api.api_key=API Key:
+gui.serverlocalizer.api.model=Model:
+gui.serverlocalizer.api.temperature=Temperature:
+gui.serverlocalizer.api.system_prompt=System Prompt:
+gui.serverlocalizer.api.tooltip.base_url=§eBase URL\nYour API server address.\n§7e.g., https://api.openai.com/v1
+gui.serverlocalizer.api.tooltip.api_key=§eAPI Key\nYour API key.\n§7e.g., sk-xxxxxxxx
+gui.serverlocalizer.api.tooltip.model=§eModel\nThe AI model to use.\n§7e.g., gpt-4o, deepseek-v3
+gui.serverlocalizer.api.tooltip.temperature=§eTemperature (0.0 - 2.0)\nControls the randomness of the generated text.\n§7Lower (e.g., 0.2) -> More stable, deterministic\n§7Higher (e.g., 0.8) -> More creative
+gui.serverlocalizer.api.tooltip.system_prompt=§eSystem Prompt (Not recommended to change)\nThe initial instruction or role given to the AI to guide its translation behavior.\nPlease modify only the corresponding language if needed.
+
+# Project Info Panel
+gui.serverlocalizer.project.title=ServerLocalizer
+gui.serverlocalizer.project.description=A powerful Minecraft server content localization translation mod that lets you enjoy international servers with ease!
+gui.serverlocalizer.project.section.features=Core Features
+gui.serverlocalizer.project.section.contact=Contact & Support
+gui.serverlocalizer.project.section.contribute=How to Contribute
+gui.serverlocalizer.project.feature.item_translation=Real-time translation of item names and descriptions
+gui.serverlocalizer.project.feature.chat_translation=Intelligent chat content translation with streaming support
+gui.serverlocalizer.project.feature.config_gui=Visual configuration interface with hot reload support
+gui.serverlocalizer.project.feature.openai_compatible=Compatible with all OpenAI API standard interfaces
+gui.serverlocalizer.project.link.github=GitHub Repository: 
+gui.serverlocalizer.project.link.github_text=CedarXuesong/ServerLocalizer
+gui.serverlocalizer.project.link.issues=Issues & Feedback: 
+gui.serverlocalizer.project.link.issues_text=Submit Issue
+gui.serverlocalizer.project.link.bilibili=Bilibili: 
+gui.serverlocalizer.project.link.bilibili_text=雪松CedarXuesong
+gui.serverlocalizer.project.contribute.text=We welcome all forms of contributions, including bug reports, translation improvements, or new features. Please fork the repository and submit a Pull Request with your changes.
+gui.serverlocalizer.project.tooltip.click_to_open=Click to open: 
+
+# Commands
+command.serverlocalizer.usage=§e=== ServerLocalizer Command Help ===\n§b/serverlocalizer translate <messageId> §f- Translate chat message\n§b/serverlocalizer config §f- Open configuration interface\n§7Enter subcommands for more help
+command.serverlocalizer.translate.usage=§e=== Chat Translation Command Help ===\n§b/serverlocalizer translate <messageId> §f- Translate chat message with specified ID\n§7Tip: Click the [T] button after chat messages for quick translation
+command.serverlocalizer.translate.disabled=§cPlease enable translation first and try again!
+command.serverlocalizer.translate.translating=Translating...
+command.serverlocalizer.translate.connecting=§eConnecting...
+command.serverlocalizer.translate.thinking=§eThinking... Tokens: %d §n§lView thinking content§r                
+command.serverlocalizer.translate.failed=§cTranslation failed
+command.serverlocalizer.translate.failed_with_error=§cTranslation failed: %s
+command.serverlocalizer.translate.failed_with_id=§cTranslation failed (ID: %s): %s
+command.serverlocalizer.translate.api_key_empty=§r§cAPI key is empty, please open the mod configuration page to configure the API key!
+command.serverlocalizer.translate.api_error=Error occurred during translation: %s 

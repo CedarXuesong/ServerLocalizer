@@ -1,4 +1,4 @@
-# 🌐 CedarServerLocalizer
+# 🌐 ServerLocalizer
 
 [![Minecraft](https://img.shields.io/badge/Minecraft-1.8.9-brightgreen.svg)](https://minecraft.net)
 [![Forge](https://img.shields.io/badge/Forge-11.15.1.2318-blue.svg)](https://files.minecraftforge.net)
@@ -25,8 +25,6 @@ CedarServerLocalizer 是一个专为 Minecraft 1.8.9 开发的 Forge 模组，�
 
 ### 用户体验
 - **可视化配置界面**: 提供现代化的GUI，方便用户调整所有配置。
-- **开发者选项**: 内置调试窗口开关，方便开发者进行问题排查。
-- **命令支持**: 支持通过命令快速访问核心功能。
 
 ## 📥 安装指南
 

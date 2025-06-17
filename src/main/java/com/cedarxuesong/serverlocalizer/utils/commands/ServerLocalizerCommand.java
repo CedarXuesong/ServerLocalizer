@@ -1,6 +1,7 @@
 package com.cedarxuesong.serverlocalizer.utils.commands;
 
 import com.cedarxuesong.serverlocalizer.utils.mylog.mylog;
+import com.cedarxuesong.serverlocalizer.utils.Lang;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -65,12 +66,7 @@ public class ServerLocalizerCommand extends CommandBase {
     }
     
     private void showUsage(ICommandSender sender) {
-        IChatComponent usageMessage = new ChatComponentText(
-                "§e=== ServerLocalizer 命令帮助 ===\n" +
-                "§b/serverlocalizer translate <messageId> §f- 翻译聊天消息\n" +
-                "§b/serverlocalizer config §f- 打开配置界面\n" +
-                "§7输入子命令获取更多帮助"
-        );
+        IChatComponent usageMessage = new ChatComponentText(Lang.translate("command.serverlocalizer.usage"));
         sender.addChatMessage(usageMessage);
     }
     

@@ -1,5 +1,6 @@
 package com.cedarxuesong.serverlocalizer.utils.gui.panel;
 
+import com.cedarxuesong.serverlocalizer.utils.Lang;
 import com.cedarxuesong.serverlocalizer.utils.gui.ModernButton;
 import com.cedarxuesong.serverlocalizer.utils.mylog.mylog;
 import net.minecraft.client.gui.GuiButton;
@@ -24,6 +25,8 @@ public class ChatTranslationPanel extends BasePanel {
     private GuiTextField chatTemperatureField;
     private GuiTextField chatSystemPromptField;
 
+    private int maxLabelWidth = 0;
+
     public ChatTranslationPanel(GuiScreen parent) {
         super(parent);
     }
@@ -35,11 +38,27 @@ public class ChatTranslationPanel extends BasePanel {
 
         int padding = 15;
         int contentWidth = panelWidth - padding * 2;
-        int labelWidth = 70;
-        int fieldWidth = contentWidth - labelWidth;
+        int fieldWidth;
 
-        this.chatTranslationToggle = new ModernButton(203, 0, 0, 90, 20, "");
-        this.streamToggle = new ModernButton(204, 0, 0, 90, 20, "");
+        // 计算API设置部分的最大标签宽度
+        this.maxLabelWidth = 0;
+        String[] apiLabels = {
+                "gui.serverlocalizer.api.base_url",
+                "gui.serverlocalizer.api.api_key",
+                "gui.serverlocalizer.api.model",
+                "gui.serverlocalizer.api.temperature",
+                "gui.serverlocalizer.api.system_prompt"
+        };
+        for (String labelKey : apiLabels) {
+            this.maxLabelWidth = Math.max(this.maxLabelWidth, this.fontRendererObj.getStringWidth(Lang.translate(labelKey)));
+        }
+
+        int labelControlSpacing = 8;
+        fieldWidth = contentWidth - this.maxLabelWidth - labelControlSpacing;
+
+        this.chatTranslationToggle = new ModernButton(203, 0, 0, 0, 20, ""); // 宽度稍后计算
+        this.streamToggle = new ModernButton(204, 0, 0, 0, 20, ""); // 宽度稍后计算
+
         this.chatBaseUrlField = new GuiTextField(11, this.fontRendererObj, 0, 0, fieldWidth, 20);
         this.chatBaseUrlField.setMaxStringLength(32767);
         this.chatApiKeyField = new GuiTextField(5, this.fontRendererObj, 0, 0, fieldWidth, 20);
@@ -68,7 +87,8 @@ public class ChatTranslationPanel extends BasePanel {
         int padding = 15;
         int contentX = panelX + padding;
         int y = panelY + padding;
-        int labelWidth = 70;
+        int labelControlSpacing = 8;
+        int controlX = contentX + this.maxLabelWidth + labelControlSpacing;
 
         // 总开关
         this.chatTranslationToggle.xPosition = contentX;
@@ -76,36 +96,36 @@ public class ChatTranslationPanel extends BasePanel {
         y += 35;
 
         // Base URL
-        drawString("Base URL:", contentX, y + 5);
-        this.chatBaseUrlField.xPosition = contentX + labelWidth;
+        drawString(Lang.translate("gui.serverlocalizer.api.base_url"), contentX, y + 6);
+        this.chatBaseUrlField.xPosition = controlX;
         this.chatBaseUrlField.yPosition = y;
         this.chatBaseUrlField.drawTextBox();
         y += 25;
 
         // API Key
-        drawString("API Key:", contentX, y + 5);
-        this.chatApiKeyField.xPosition = contentX + labelWidth;
+        drawString(Lang.translate("gui.serverlocalizer.api.api_key"), contentX, y + 6);
+        this.chatApiKeyField.xPosition = controlX;
         this.chatApiKeyField.yPosition = y;
         this.chatApiKeyField.drawTextBox();
         y += 25;
 
         // 模型
-        drawString("模型:", contentX, y + 5);
-        this.chatModelField.xPosition = contentX + labelWidth;
+        drawString(Lang.translate("gui.serverlocalizer.api.model"), contentX, y + 6);
+        this.chatModelField.xPosition = controlX;
         this.chatModelField.yPosition = y;
         this.chatModelField.drawTextBox();
         y += 25;
 
         // 温度
-        drawString("温度:", contentX, y + 5);
-        this.chatTemperatureField.xPosition = contentX + labelWidth;
+        drawString(Lang.translate("gui.serverlocalizer.api.temperature"), contentX, y + 6);
+        this.chatTemperatureField.xPosition = controlX;
         this.chatTemperatureField.yPosition = y;
         this.chatTemperatureField.drawTextBox();
         y += 25;
 
         // 系统提示词
-        drawString("系统提示词:", contentX, y + 5);
-        this.chatSystemPromptField.xPosition = contentX + labelWidth;
+        drawString(Lang.translate("gui.serverlocalizer.api.system_prompt"), contentX, y + 6);
+        this.chatSystemPromptField.xPosition = controlX;
         this.chatSystemPromptField.yPosition = y;
         this.chatSystemPromptField.drawTextBox();
         y += 35;
@@ -117,13 +137,13 @@ public class ChatTranslationPanel extends BasePanel {
 
     @Override
     public void addTooltips(int mouseX, int mouseY, int localMouseY) {
-        if (isMouseOver(this.chatTranslationToggle, mouseX, localMouseY)) drawHoveringText(Arrays.asList("§e聊天翻译总开关", "启用或禁用所有聊天内容的翻译功能。"), mouseX, mouseY);
-        if (isMouseOver(this.streamToggle, mouseX, localMouseY)) drawHoveringText(Arrays.asList("§e流式响应", "启用后，翻译结果将逐字显示，", "无需等待完整响应，实时查看。"), mouseX, mouseY);
-        if (isMouseOver(this.chatBaseUrlField, mouseX, localMouseY)) drawHoveringText(Arrays.asList("§eBase URL", "你的API服务器地址。", "例如: §7https://api.openai.com/v1"), mouseX, mouseY);
-        if (isMouseOver(this.chatApiKeyField, mouseX, localMouseY)) drawHoveringText(Arrays.asList("§eAPI Key", "你的API密钥。", "例如: §7sk-xxxxxxxx"), mouseX, mouseY);
-        if (isMouseOver(this.chatModelField, mouseX, localMouseY)) drawHoveringText(Arrays.asList("§e模型", "所使用的AI模型。", "例如: §7gpt-4o, deepseek-v3"), mouseX, mouseY);
-        if (isMouseOver(this.chatTemperatureField, mouseX, localMouseY)) drawHoveringText(Arrays.asList("§e温度 (0.0 - 2.0)", "控制生成文本的随机性。", "§7较低值 (如0.2) -> 更稳定、确定", "§7较高值 (如0.8) -> 更具创造性"), mouseX, mouseY);
-        if (isMouseOver(this.chatSystemPromptField, mouseX, localMouseY)) drawHoveringText(Arrays.asList("§e系统提示词 (不建议修改)", "给AI设定的初始指令或角色，", "用于指导其翻译行为。"), mouseX, mouseY);
+        if (isMouseOver(this.chatTranslationToggle, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.chat.tooltip.enable").split("\n")), mouseX, mouseY);
+        if (isMouseOver(this.streamToggle, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.chat.tooltip.enable_stream").split("\n")), mouseX, mouseY);
+        if (isMouseOver(this.chatBaseUrlField, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.api.tooltip.base_url").split("\n")), mouseX, mouseY);
+        if (isMouseOver(this.chatApiKeyField, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.api.tooltip.api_key").split("\n")), mouseX, mouseY);
+        if (isMouseOver(this.chatModelField, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.api.tooltip.model").split("\n")), mouseX, mouseY);
+        if (isMouseOver(this.chatTemperatureField, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.api.tooltip.temperature").split("\n")), mouseX, mouseY);
+        if (isMouseOver(this.chatSystemPromptField, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.api.tooltip.system_prompt").split("\n")), mouseX, mouseY);
     }
 
     @Override
@@ -139,7 +159,7 @@ public class ChatTranslationPanel extends BasePanel {
         try {
             modConfig.setTemperature(API_NAME, Double.parseDouble(this.chatTemperatureField.getText()));
         } catch (NumberFormatException e) {
-            mylog.error(TAG, "无效的聊天翻译温度值: " + this.chatTemperatureField.getText());
+            mylog.error(TAG, "Invalid temperature value for chat translation: " + this.chatTemperatureField.getText());
         }
         modConfig.setSystemPrompt(API_NAME, this.chatSystemPromptField.getText());
     }
@@ -177,12 +197,14 @@ public class ChatTranslationPanel extends BasePanel {
         final int TEXT_COLOR = 0xFFFFFFFF;
 
         boolean chatEnabled = modConfig.isChatTranslationEnabled();
-        this.chatTranslationToggle.displayString = "聊天翻译: " + (chatEnabled ? "§a开" : "§c关");
+        this.chatTranslationToggle.displayString = Lang.translate("gui.serverlocalizer.chat.enable") + (chatEnabled ? "§a" + Lang.translate("options.on") : "§c" + Lang.translate("options.off"));
+        this.chatTranslationToggle.width = this.fontRendererObj.getStringWidth(this.chatTranslationToggle.displayString) + 20;
         this.chatTranslationToggle.setColors(chatEnabled ? IDLE_ON : IDLE_OFF, chatEnabled ? HOVER_ON : HOVER_OFF);
         this.chatTranslationToggle.packedFGColour = TEXT_COLOR;
 
         boolean streamEnabled = modConfig.isChatStreamEnabled();
-        this.streamToggle.displayString = "流式响应: " + (streamEnabled ? "§a开" : "§c关");
+        this.streamToggle.displayString = Lang.translate("gui.serverlocalizer.chat.enable_stream") + (streamEnabled ? "§a" + Lang.translate("options.on") : "§c" + Lang.translate("options.off"));
+        this.streamToggle.width = this.fontRendererObj.getStringWidth(this.streamToggle.displayString) + 20;
         this.streamToggle.setColors(streamEnabled ? IDLE_ON : IDLE_OFF, streamEnabled ? HOVER_ON : HOVER_OFF);
         this.streamToggle.packedFGColour = TEXT_COLOR;
         this.streamToggle.enabled = chatEnabled;

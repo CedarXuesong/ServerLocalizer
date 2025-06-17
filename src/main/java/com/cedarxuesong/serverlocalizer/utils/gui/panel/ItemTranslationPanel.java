@@ -1,5 +1,6 @@
 package com.cedarxuesong.serverlocalizer.utils.gui.panel;
 
+import com.cedarxuesong.serverlocalizer.utils.Lang;
 import com.cedarxuesong.serverlocalizer.utils.gui.ModernButton;
 import com.cedarxuesong.serverlocalizer.utils.mylog.mylog;
 import net.minecraft.client.gui.GuiButton;
@@ -25,6 +26,8 @@ public class ItemTranslationPanel extends BasePanel {
     private ModernButton itemNameToggle;
     private ModernButton itemLoreToggle;
 
+    private int maxLabelWidth = 0;
+
     public ItemTranslationPanel(GuiScreen parent) {
         super(parent);
     }
@@ -36,10 +39,30 @@ public class ItemTranslationPanel extends BasePanel {
 
         int padding = 15;
         int contentWidth = panelWidth - padding * 2;
-        int labelWidth = 70;
-        int fieldWidth = contentWidth - labelWidth;
+        int fieldWidth;
 
-        this.itemTranslationToggle = new ModernButton(200, 0, 0, 90, 20, "");
+        // 计算API设置部分的最大标签宽度
+        this.maxLabelWidth = 0;
+        String[] apiLabels = {
+                "gui.serverlocalizer.api.base_url",
+                "gui.serverlocalizer.api.api_key",
+                "gui.serverlocalizer.api.model",
+                "gui.serverlocalizer.api.temperature",
+                "gui.serverlocalizer.api.system_prompt"
+        };
+        for (String labelKey : apiLabels) {
+            this.maxLabelWidth = Math.max(this.maxLabelWidth, this.fontRendererObj.getStringWidth(Lang.translate(labelKey)));
+        }
+
+        // 留出标签和控件之间的间距
+        int labelControlSpacing = 8;
+        fieldWidth = contentWidth - this.maxLabelWidth - labelControlSpacing;
+
+        // 初始化按钮和文本框
+        this.itemTranslationToggle = new ModernButton(200, 0, 0, 0, 20, ""); // 宽度稍后计算
+        this.itemNameToggle = new ModernButton(201, 0, 0, 0, 20, ""); // 宽度稍后计算
+        this.itemLoreToggle = new ModernButton(202, 0, 0, 0, 20, ""); // 宽度稍后计算
+
         this.itemBaseUrlField = new GuiTextField(10, this.fontRendererObj, 0, 0, fieldWidth, 20);
         this.itemBaseUrlField.setMaxStringLength(32767);
         this.itemApiKeyField = new GuiTextField(1, this.fontRendererObj, 0, 0, fieldWidth, 20);
@@ -50,8 +73,6 @@ public class ItemTranslationPanel extends BasePanel {
         this.itemTemperatureField.setMaxStringLength(32767);
         this.itemSystemPromptField = new GuiTextField(8, this.fontRendererObj, 0, 0, fieldWidth, 20);
         this.itemSystemPromptField.setMaxStringLength(32767);
-        this.itemNameToggle = new ModernButton(201, 0, 0, 90, 20, "");
-        this.itemLoreToggle = new ModernButton(202, 0, 0, 90, 20, "");
 
         this.buttons.add(this.itemTranslationToggle);
         this.buttons.add(this.itemNameToggle);
@@ -63,7 +84,7 @@ public class ItemTranslationPanel extends BasePanel {
         this.textFields.add(this.itemTemperatureField);
         this.textFields.add(this.itemSystemPromptField);
 
-        resetConfig();
+        resetConfig(); // 这会调用 updateButtonLabels
     }
 
     @Override
@@ -71,8 +92,9 @@ public class ItemTranslationPanel extends BasePanel {
         int padding = 15;
         int contentX = panelX + padding;
         int y = panelY + padding;
-        int labelWidth = 70;
-        int toggleWidth = 90;
+        int labelControlSpacing = 8;
+        int controlX = contentX + this.maxLabelWidth + labelControlSpacing;
+        int toggleButtonSpacing = 10;
 
         // 总开关
         this.itemTranslationToggle.xPosition = contentX;
@@ -80,36 +102,36 @@ public class ItemTranslationPanel extends BasePanel {
         y += 35;
 
         // Base URL
-        drawString("Base URL:", contentX, y + 5);
-        this.itemBaseUrlField.xPosition = contentX + labelWidth;
+        drawString(Lang.translate("gui.serverlocalizer.api.base_url"), contentX, y + 6);
+        this.itemBaseUrlField.xPosition = controlX;
         this.itemBaseUrlField.yPosition = y;
         this.itemBaseUrlField.drawTextBox();
         y += 25;
 
         // API Key
-        drawString("API Key:", contentX, y + 5);
-        this.itemApiKeyField.xPosition = contentX + labelWidth;
+        drawString(Lang.translate("gui.serverlocalizer.api.api_key"), contentX, y + 6);
+        this.itemApiKeyField.xPosition = controlX;
         this.itemApiKeyField.yPosition = y;
         this.itemApiKeyField.drawTextBox();
         y += 25;
 
         // 模型
-        drawString("模型:", contentX, y + 5);
-        this.itemModelField.xPosition = contentX + labelWidth;
+        drawString(Lang.translate("gui.serverlocalizer.api.model"), contentX, y + 6);
+        this.itemModelField.xPosition = controlX;
         this.itemModelField.yPosition = y;
         this.itemModelField.drawTextBox();
         y += 25;
 
         // 温度
-        drawString("温度:", contentX, y + 5);
-        this.itemTemperatureField.xPosition = contentX + labelWidth;
+        drawString(Lang.translate("gui.serverlocalizer.api.temperature"), contentX, y + 6);
+        this.itemTemperatureField.xPosition = controlX;
         this.itemTemperatureField.yPosition = y;
         this.itemTemperatureField.drawTextBox();
         y += 25;
 
         // 系统提示词
-        drawString("系统提示词:", contentX, y + 5);
-        this.itemSystemPromptField.xPosition = contentX + labelWidth;
+        drawString(Lang.translate("gui.serverlocalizer.api.system_prompt"), contentX, y + 6);
+        this.itemSystemPromptField.xPosition = controlX;
         this.itemSystemPromptField.yPosition = y;
         this.itemSystemPromptField.drawTextBox();
         y += 35;
@@ -117,26 +139,26 @@ public class ItemTranslationPanel extends BasePanel {
         // 功能按钮
         this.itemNameToggle.xPosition = contentX;
         this.itemNameToggle.yPosition = y;
-        this.itemLoreToggle.xPosition = contentX + toggleWidth + 10;
+        this.itemLoreToggle.xPosition = itemNameToggle.xPosition + itemNameToggle.width + toggleButtonSpacing;
         this.itemLoreToggle.yPosition = y;
-        y += 25;
+        y += 35;
 
         // 显示累计Token使用量
         long accumulatedTokens = modConfig.getAccumulatedTokens(API_NAME);
-        String tokenUsageText = "累计使用Tokens: " + accumulatedTokens;
+        String tokenUsageText = Lang.translate("gui.serverlocalizer.item.token_usage") + " " + accumulatedTokens;
         drawString(tokenUsageText, contentX, y);
     }
 
     @Override
     public void addTooltips(int mouseX, int mouseY, int localMouseY) {
-        if (isMouseOver(this.itemTranslationToggle, mouseX, localMouseY)) drawHoveringText(Arrays.asList("§e物品翻译总开关", "启用或禁用所有物品（名称和描述）的翻译功能。"), mouseX, mouseY);
-        if (isMouseOver(this.itemBaseUrlField, mouseX, localMouseY)) drawHoveringText(Arrays.asList("§eBase URL", "你的API服务器地址。", "例如: §7https://api.openai.com/v1"), mouseX, mouseY);
-        if (isMouseOver(this.itemApiKeyField, mouseX, localMouseY)) drawHoveringText(Arrays.asList("§eAPI Key", "你的API密钥。", "例如: §7sk-xxxxxxxx"), mouseX, mouseY);
-        if (isMouseOver(this.itemModelField, mouseX, localMouseY)) drawHoveringText(Arrays.asList("§e模型", "所使用的AI模型。", "例如: §7gpt-4o, deepseek-v3"), mouseX, mouseY);
-        if (isMouseOver(this.itemTemperatureField, mouseX, localMouseY)) drawHoveringText(Arrays.asList("§e温度 (0.0 - 2.0)", "控制生成文本的随机性。", "§7较低值 (如0.2) -> 更稳定、确定", "§7较高值 (如0.8) -> 更具创造性"), mouseX, mouseY);
-        if (isMouseOver(this.itemSystemPromptField, mouseX, localMouseY)) drawHoveringText(Arrays.asList("§e系统提示词 (不建议修改)", "给AI设定的初始指令或角色，", "用于指导其翻译行为。"), mouseX, mouseY);
-        if (isMouseOver(this.itemNameToggle, mouseX, localMouseY)) drawHoveringText(Arrays.asList("§e物品名称翻译", "单独控制物品名称的翻译功能。"), mouseX, mouseY);
-        if (isMouseOver(this.itemLoreToggle, mouseX, localMouseY)) drawHoveringText(Arrays.asList("§e物品描述翻译", "单独控制物品Lore(描述)的翻译功能。"), mouseX, mouseY);
+        if (isMouseOver(this.itemTranslationToggle, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.item.tooltip.enable").split("\n")), mouseX, mouseY);
+        if (isMouseOver(this.itemBaseUrlField, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.api.tooltip.base_url").split("\n")), mouseX, mouseY);
+        if (isMouseOver(this.itemApiKeyField, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.api.tooltip.api_key").split("\n")), mouseX, mouseY);
+        if (isMouseOver(this.itemModelField, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.api.tooltip.model").split("\n")), mouseX, mouseY);
+        if (isMouseOver(this.itemTemperatureField, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.api.tooltip.temperature").split("\n")), mouseX, mouseY);
+        if (isMouseOver(this.itemSystemPromptField, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.api.tooltip.system_prompt").split("\n")), mouseX, mouseY);
+        if (isMouseOver(this.itemNameToggle, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.item.tooltip.enable_name").split("\n")), mouseX, mouseY);
+        if (isMouseOver(this.itemLoreToggle, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.item.tooltip.enable_lore").split("\n")), mouseX, mouseY);
     }
 
     @Override
@@ -152,7 +174,7 @@ public class ItemTranslationPanel extends BasePanel {
         try {
             modConfig.setTemperature(API_NAME, Double.parseDouble(this.itemTemperatureField.getText()));
         } catch (NumberFormatException e) {
-            mylog.error(TAG, "无效的物品翻译温度值: " + this.itemTemperatureField.getText());
+            mylog.error(TAG, "Invalid temperature value for item translation: " + this.itemTemperatureField.getText());
         }
         modConfig.setSystemPrompt(API_NAME, this.itemSystemPromptField.getText());
     }
@@ -194,18 +216,21 @@ public class ItemTranslationPanel extends BasePanel {
         final int TEXT_COLOR = 0xFFFFFFFF;
 
         boolean itemEnabled = modConfig.isItemTranslationEnabled();
-        this.itemTranslationToggle.displayString = "物品翻译: " + (itemEnabled ? "§a开" : "§c关");
+        this.itemTranslationToggle.displayString = Lang.translate("gui.serverlocalizer.item.enable") + (itemEnabled ? "§a" + Lang.translate("options.on") : "§c" + Lang.translate("options.off"));
+        this.itemTranslationToggle.width = this.fontRendererObj.getStringWidth(this.itemTranslationToggle.displayString) + 20;
         this.itemTranslationToggle.setColors(itemEnabled ? IDLE_ON : IDLE_OFF, itemEnabled ? HOVER_ON : HOVER_OFF);
         this.itemTranslationToggle.packedFGColour = TEXT_COLOR;
 
         boolean nameEnabled = modConfig.isItemNameTranslationEnabled();
-        this.itemNameToggle.displayString = "物品名: " + (nameEnabled ? "§a开" : "§c关");
+        this.itemNameToggle.displayString = Lang.translate("gui.serverlocalizer.item.enable_name") + (nameEnabled ? "§a" + Lang.translate("options.on") : "§c" + Lang.translate("options.off"));
+        this.itemNameToggle.width = this.fontRendererObj.getStringWidth(this.itemNameToggle.displayString) + 20;
         this.itemNameToggle.setColors(nameEnabled ? IDLE_ON : IDLE_OFF, nameEnabled ? HOVER_ON : HOVER_OFF);
         this.itemNameToggle.packedFGColour = TEXT_COLOR;
         this.itemNameToggle.enabled = itemEnabled;
 
         boolean loreEnabled = modConfig.isItemLoreTranslationEnabled();
-        this.itemLoreToggle.displayString = "物品描述: " + (loreEnabled ? "§a开" : "§c关");
+        this.itemLoreToggle.displayString = Lang.translate("gui.serverlocalizer.item.enable_lore") + (loreEnabled ? "§a" + Lang.translate("options.on") : "§c" + Lang.translate("options.off"));
+        this.itemLoreToggle.width = this.fontRendererObj.getStringWidth(this.itemLoreToggle.displayString) + 20;
         this.itemLoreToggle.setColors(loreEnabled ? IDLE_ON : IDLE_OFF, loreEnabled ? HOVER_ON : HOVER_OFF);
         this.itemLoreToggle.packedFGColour = TEXT_COLOR;
         this.itemLoreToggle.enabled = itemEnabled;

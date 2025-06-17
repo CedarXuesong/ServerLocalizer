@@ -3,6 +3,7 @@ package com.cedarxuesong.serverlocalizer.utils.gui.panel;
 import com.cedarxuesong.serverlocalizer.utils.ai.ModConfig;
 import com.cedarxuesong.serverlocalizer.utils.gui.ConfigGui;
 import com.cedarxuesong.serverlocalizer.utils.gui.ModernButton;
+import com.cedarxuesong.serverlocalizer.utils.Lang;
 import net.minecraft.client.gui.GuiButton;
 
 import java.util.Arrays;
@@ -21,7 +22,7 @@ public class DeveloperOptionsPanel extends BasePanel {
         this.buttons.clear();
         this.textFields.clear();
 
-        debugWindowToggle = new ModernButton(400, 0, 0, 90, 20, "");
+        debugWindowToggle = new ModernButton(400, 0, 0, 0, 20, "");
         this.buttons.add(debugWindowToggle);
 
         updateButtonStates();
@@ -65,13 +66,19 @@ public class DeveloperOptionsPanel extends BasePanel {
     public void addTooltips(int mouseX, int guiMouseY, int localMouseY) {
         if (debugWindowToggle.isMouseOver()) {
             if (parent instanceof ConfigGui) {
-                ((ConfigGui) parent).drawPublicHoveringText(Arrays.asList("§e调试窗口", "开启后将显示一个实时日志窗口，", "用于开发和问题排查。", "§c需要重启游戏才能生效。"), mouseX, guiMouseY);
+                ((ConfigGui) parent).drawPublicHoveringText(Arrays.asList(
+                    Lang.translate("gui.serverlocalizer.developer.debug_window.tooltip.line1"),
+                    Lang.translate("gui.serverlocalizer.developer.debug_window.tooltip.line2"),
+                    Lang.translate("gui.serverlocalizer.developer.debug_window.tooltip.line3"),
+                    Lang.translate("gui.serverlocalizer.developer.debug_window.tooltip.line4")
+                ), mouseX, guiMouseY);
             }
         }
     }
 
     private void updateButtonStates() {
         boolean enabled = modConfig.isDebugWindowEnabled();
-        debugWindowToggle.displayString = "调试窗口: " + (enabled ? "§a开启" : "§c关闭");
+        debugWindowToggle.displayString = Lang.translate("gui.serverlocalizer.developer.debug_window") + (enabled ? "§a" + Lang.translate("options.on") : "§c" + Lang.translate("options.off"));
+        debugWindowToggle.width = this.fontRendererObj.getStringWidth(debugWindowToggle.displayString) + 20;
     }
 }

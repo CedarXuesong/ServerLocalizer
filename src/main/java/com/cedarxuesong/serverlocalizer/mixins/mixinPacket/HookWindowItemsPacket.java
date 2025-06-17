@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(S30PacketWindowItems.class)
 public class HookWindowItemsPacket {
     @Unique
-    private static final String cedarServerLocalizer$TAG = "ItemPacket";
+    private static final String ServerLocalizer$TAG = "ItemPacket";
 
     @Shadow
     private int windowId;
@@ -118,7 +118,7 @@ public class HookWindowItemsPacket {
                         }
 
                     } catch (Exception e) {
-                        mylog.error(cedarServerLocalizer$TAG, "处理槽位 " + i + " 的物品数据包时发生错误", e);
+                        mylog.error(ServerLocalizer$TAG, "处理槽位 " + i + " 的物品数据包时发生错误", e);
                     }
                 }
             }

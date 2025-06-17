@@ -6,6 +6,7 @@ import com.cedarxuesong.serverlocalizer.utils.gui.panel.ChatTranslationPanel;
 import com.cedarxuesong.serverlocalizer.utils.gui.panel.DeveloperOptionsPanel;
 import com.cedarxuesong.serverlocalizer.utils.gui.panel.ItemTranslationPanel;
 import com.cedarxuesong.serverlocalizer.utils.gui.panel.ProjectInfoPanel;
+import com.cedarxuesong.serverlocalizer.utils.Lang;
 import com.cedarxuesong.serverlocalizer.utils.mylog.mylog;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
@@ -145,9 +146,9 @@ public class ConfigGui extends GuiScreen {
         int bottomButtonHeight = 20;
         int bottomButtonY = this.height - 30;
         int bottomButtonSpacing = 5;
-        this.resetButton = new ModernButton(102, 10, bottomButtonY, bottomButtonWidth, bottomButtonHeight, "重置", 0xFFB08C4A, 0xFF8C6D3A);
-        this.saveButton = new ModernButton(100, 10 + bottomButtonWidth + bottomButtonSpacing, bottomButtonY, bottomButtonWidth, bottomButtonHeight, "保存", 0xFF558E74, 0xFF436E5A);
-        this.cancelButton = new ModernButton(101, 10 + (bottomButtonWidth + bottomButtonSpacing) * 2, bottomButtonY, bottomButtonWidth, bottomButtonHeight, "取消", 0xFFB35959, 0xFF8C4545);
+        this.resetButton = new ModernButton(102, 10, bottomButtonY, bottomButtonWidth, bottomButtonHeight, Lang.translate("gui.serverlocalizer.reset"), 0xFFB08C4A, 0xFF8C6D3A);
+        this.saveButton = new ModernButton(100, 10 + bottomButtonWidth + bottomButtonSpacing, bottomButtonY, bottomButtonWidth, bottomButtonHeight, Lang.translate("gui.serverlocalizer.save"), 0xFF558E74, 0xFF436E5A);
+        this.cancelButton = new ModernButton(101, 10 + (bottomButtonWidth + bottomButtonSpacing) * 2, bottomButtonY, bottomButtonWidth, bottomButtonHeight, Lang.translate("gui.serverlocalizer.cancel"), 0xFFB35959, 0xFF8C4545);
         this.buttonList.add(this.saveButton);
         this.buttonList.add(this.cancelButton);
         this.buttonList.add(this.resetButton);
@@ -231,7 +232,7 @@ public class ConfigGui extends GuiScreen {
         drawRect(0, 0, this.width, this.height, COLOR_BACKGROUND);
         updateAnimations();
 
-        this.drawCenteredString(this.fontRendererObj, "ServerLocalizer 配置", this.width / 2, 15, COLOR_TEXT_HEADER);
+        this.drawCenteredString(this.fontRendererObj, Lang.translate("gui.serverlocalizer.title"), this.width / 2, 15, COLOR_TEXT_HEADER);
 
         int leftPanelWidth = 100;
         int panelTopMargin = 35;
@@ -339,13 +340,13 @@ public class ConfigGui extends GuiScreen {
      */
     private void drawTooltips(int mouseX, int mouseY) {
         // 固定按钮 Tooltips
-        if (this.saveButton.isMouseOver()) this.drawHoveringText(Arrays.asList("§e保存", "保存所有更改并关闭界面。"), mouseX, mouseY);
-        if (this.cancelButton.isMouseOver()) this.drawHoveringText(Arrays.asList("§e取消", "放弃所有未保存的更改并关闭界面。"), mouseX, mouseY);
-        if (this.resetButton.isMouseOver()) this.drawHoveringText(Arrays.asList("§e重置", "将界面中的所有设置恢复为", "上次保存时的状态。"), mouseX, mouseY);
-        if (this.projectInfoButton.isMouseOver()) this.drawHoveringText(Arrays.asList("§e项目简介", "查看模组的基本信息、功能介绍和作者。"), mouseX, mouseY);
-        if (this.itemTranslationButton.isMouseOver()) this.drawHoveringText(Arrays.asList("§e物品翻译设置", "配置与物品名称和描述翻译相关的所有选项。"), mouseX, mouseY);
-        if (this.chatTranslationButton.isMouseOver()) this.drawHoveringText(Arrays.asList("§e聊天翻译设置", "配置与聊天内容翻译相关的所有选项。"), mouseX, mouseY);
-        if (this.developerOptionsButton.isMouseOver()) this.drawHoveringText(Arrays.asList("§e开发者选项", "用于配置模组的调试和开发功能。"), mouseX, mouseY);
+        if (this.saveButton.isMouseOver()) this.drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.tooltip.save").split("\n")), mouseX, mouseY);
+        if (this.cancelButton.isMouseOver()) this.drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.tooltip.cancel").split("\n")), mouseX, mouseY);
+        if (this.resetButton.isMouseOver()) this.drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.tooltip.reset").split("\n")), mouseX, mouseY);
+        if (this.projectInfoButton.isMouseOver()) this.drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.category.project_info")), mouseX, mouseY);
+        if (this.itemTranslationButton.isMouseOver()) this.drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.category.item_translation")), mouseX, mouseY);
+        if (this.chatTranslationButton.isMouseOver()) this.drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.category.chat_translation")), mouseX, mouseY);
+        if (this.developerOptionsButton.isMouseOver()) this.drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.category.developer_options")), mouseX, mouseY);
 
         // 面板内 Tooltips
         int rightPanelX = 115;
@@ -463,10 +464,10 @@ public class ConfigGui extends GuiScreen {
     }
     
     private void updateCategoryButtonVisuals() {
-        this.projectInfoButton.displayString = "项目简介";
-        this.itemTranslationButton.displayString = "物品翻译";
-        this.chatTranslationButton.displayString = "聊天翻译";
-        this.developerOptionsButton.displayString = "开发者选项";
+        this.projectInfoButton.displayString = Lang.translate("gui.serverlocalizer.category.project_info");
+        this.itemTranslationButton.displayString = Lang.translate("gui.serverlocalizer.category.item_translation");
+        this.chatTranslationButton.displayString = Lang.translate("gui.serverlocalizer.category.chat_translation");
+        this.developerOptionsButton.displayString = Lang.translate("gui.serverlocalizer.category.developer_options");
         
         this.projectInfoButton.packedFGColour = (this.selectedCategory == 0) ? COLOR_TEXT_HIGHLIGHT : COLOR_TEXT_WHITE;
         this.itemTranslationButton.packedFGColour = (this.selectedCategory == 1) ? COLOR_TEXT_HIGHLIGHT : COLOR_TEXT_WHITE;

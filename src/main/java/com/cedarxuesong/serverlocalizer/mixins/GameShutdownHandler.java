@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Minecraft.class)
 public class GameShutdownHandler {
     @Unique
-    private static final String cedarServerLocalizer$TAG = "GameShutdown";
+    private static final String ServerLocalizer$TAG = "GameShutdown";
     
     /**
      * 游戏关闭时触发
@@ -23,18 +23,18 @@ public class GameShutdownHandler {
     @Inject(method = "shutdownMinecraftApplet", at = @At("HEAD"))
     public void onGameShutdown(CallbackInfo ci) {
         try {
-            mylog.log(cedarServerLocalizer$TAG, "游戏正在关闭，保存翻译文件");
+            mylog.log(ServerLocalizer$TAG, "游戏正在关闭，保存翻译文件");
             
             // 保存翻译到文件
             boolean saved = ModuleTranslationManager.getInstance().saveAllTranslations();
             if (saved) {
-                mylog.log(cedarServerLocalizer$TAG, "所有翻译文件已保存");
+                mylog.log(ServerLocalizer$TAG, "所有翻译文件已保存");
             } else {
-                mylog.warn(cedarServerLocalizer$TAG, "部分或全部翻译文件保存失败");
+                mylog.warn(ServerLocalizer$TAG, "部分或全部翻译文件保存失败");
             }
             
         } catch (Exception e) {
-            mylog.error(cedarServerLocalizer$TAG, "处理游戏关闭事件时发生错误", e);
+            mylog.error(ServerLocalizer$TAG, "处理游戏关闭事件时发生错误", e);
         }
     }
 } 

@@ -20,7 +20,7 @@ import java.util.UUID;
 @Mixin(GuiNewChat.class)
 public class mixinGuiChat {
     @Unique
-    private static final String cedarServerLocalizer$TAG = "ChatMixin";
+    private static final String ServerLocalizer$TAG = "ChatMixin";
 
     @ModifyArg(
         method = "printChatMessageWithOptionalDeletion",
@@ -63,7 +63,7 @@ public class mixinGuiChat {
             // 将[T]标记添加到原始消息后面
             return component.appendSibling(translationMark);
         } catch (Exception e) {
-            mylog.error(cedarServerLocalizer$TAG, "处理聊天消息时发生错误", e);
+            mylog.error(ServerLocalizer$TAG, "处理聊天消息时发生错误", e);
             return component;
         }
     }

@@ -1,0 +1,89 @@
+# General
+gui.serverlocalizer.save=保存
+gui.serverlocalizer.cancel=取消
+gui.serverlocalizer.reset=重置
+gui.serverlocalizer.title=ServerLocalizer 配置
+
+# Categories
+gui.serverlocalizer.category.project_info=项目简介
+gui.serverlocalizer.category.item_translation=物品翻译
+gui.serverlocalizer.category.chat_translation=聊天翻译
+gui.serverlocalizer.category.developer_options=开发者选项
+
+# Tooltips
+gui.serverlocalizer.tooltip.project_info=查看模组的基本信息、功能介绍和作者。
+gui.serverlocalizer.tooltip.item_translation=配置与物品名称和描述翻译相关的所有选项。
+gui.serverlocalizer.tooltip.chat_translation=配置与聊天内容翻译相关的所有选项。
+gui.serverlocalizer.tooltip.developer_options=用于配置模组的调试和开发功能。
+gui.serverlocalizer.tooltip.save=保存所有更改并关闭界面。
+gui.serverlocalizer.tooltip.cancel=放弃所有未保存的更改并关闭界面。
+gui.serverlocalizer.tooltip.reset=将界面中的所有设置恢复为上次保存时的状态。
+
+# Developer Options Panel
+gui.serverlocalizer.developer.debug_window=调试窗口:
+gui.serverlocalizer.developer.debug_window.tooltip.line1=§e调试窗口
+gui.serverlocalizer.developer.debug_window.tooltip.line2=开启后将显示一个实时日志窗口，
+gui.serverlocalizer.developer.debug_window.tooltip.line3=用于开发和问题排查。
+gui.serverlocalizer.developer.debug_window.tooltip.line4=§c需要重启游戏才能生效。
+
+# Item Translation Panel
+gui.serverlocalizer.item.title=物品翻译
+gui.serverlocalizer.item.enable=物品翻译:
+gui.serverlocalizer.item.enable_name=翻译名称:
+gui.serverlocalizer.item.enable_lore=翻译描述:
+gui.serverlocalizer.item.tooltip.enable=启用或禁用所有物品（名称和描述）的翻译功能。
+gui.serverlocalizer.item.tooltip.enable_name=单独控制物品名称的翻译功能。
+gui.serverlocalizer.item.tooltip.enable_lore=单独控制物品Lore(描述)的翻译功能。
+gui.serverlocalizer.item.token_usage=累计使用Tokens:
+
+# Chat Translation Panel
+gui.serverlocalizer.chat.title=聊天翻译
+gui.serverlocalizer.chat.enable=聊天翻译:
+gui.serverlocalizer.chat.enable_stream=流式响应:
+gui.serverlocalizer.chat.tooltip.enable=启用或禁用所有聊天内容的翻译功能。
+gui.serverlocalizer.chat.tooltip.enable_stream=启用后，翻译结果将逐字显示，无需等待完整响应，实时查看。
+
+# Common API Settings
+gui.serverlocalizer.api.base_url=API地址:
+gui.serverlocalizer.api.api_key=API密钥:
+gui.serverlocalizer.api.model=模型:
+gui.serverlocalizer.api.temperature=温度:
+gui.serverlocalizer.api.system_prompt=系统提示词:
+gui.serverlocalizer.api.tooltip.base_url=§eAPI地址\n你的API服务器地址。\n§7例如: https://api.openai.com/v1
+gui.serverlocalizer.api.tooltip.api_key=§eAPI密钥\n你的API密钥。\n§7例如: sk-xxxxxxxx
+gui.serverlocalizer.api.tooltip.model=§e模型\n所使用的AI模型。\n§7例如: gpt-4o, deepseek-v3
+gui.serverlocalizer.api.tooltip.temperature=§e温度 (0.0 - 2.0)\n控制生成文本的随机性。\n§7较低值 (如0.2) -> 更稳定、确定\n§7较高值 (如0.8) -> 更具创造性
+gui.serverlocalizer.api.tooltip.system_prompt=§e系统提示词 (不建议修改)\n给AI设定的初始指令或角色，用于指导其翻译行为。\n如需要请仅修改对应语言。
+
+# Project Info Panel
+gui.serverlocalizer.project.title=ServerLocalizer
+gui.serverlocalizer.project.description=一个强大的 Minecraft 服务器内容本地化翻译模组，让您轻松畅玩国际服务器！
+gui.serverlocalizer.project.section.features=核心功能
+gui.serverlocalizer.project.section.contact=联系与支持
+gui.serverlocalizer.project.section.contribute=如何贡献
+gui.serverlocalizer.project.feature.item_translation=实时翻译物品名称和描述
+gui.serverlocalizer.project.feature.chat_translation=智能翻译聊天内容，支持流式响应
+gui.serverlocalizer.project.feature.config_gui=可视化配置界面，支持热重载
+gui.serverlocalizer.project.feature.openai_compatible=兼容所有 OpenAI 接口标准的 API
+gui.serverlocalizer.project.link.github=GitHub 仓库: 
+gui.serverlocalizer.project.link.github_text=CedarXuesong/ServerLocalizer
+gui.serverlocalizer.project.link.issues=问题与反馈: 
+gui.serverlocalizer.project.link.issues_text=提交 Issue
+gui.serverlocalizer.project.link.bilibili=Bilibili: 
+gui.serverlocalizer.project.link.bilibili_text=雪松CedarXuesong
+gui.serverlocalizer.project.contribute.text=我们欢迎各种形式的贡献，包括提交Bug、改进翻译或添加新功能。请通过 Fork 仓库并发起 Pull Request 来提交您的更改。
+gui.serverlocalizer.project.tooltip.click_to_open=点击打开: 
+
+# Commands
+command.serverlocalizer.usage=§e=== ServerLocalizer 命令帮助 ===\n§b/serverlocalizer translate <messageId> §f- 翻译聊天消息\n§b/serverlocalizer config §f- 打开配置界面\n§7输入子命令获取更多帮助
+command.serverlocalizer.translate.usage=§e=== 聊天翻译命令帮助 ===\n§b/serverlocalizer translate <messageId> §f- 翻译指定ID的聊天消息\n§7提示：点击聊天消息后的[T]标记可以快速翻译
+command.serverlocalizer.translate.disabled=§c请打开翻译开关后重试！
+command.serverlocalizer.translate.translating=正在翻译中...
+command.serverlocalizer.translate.connecting=§e连接中...
+command.serverlocalizer.translate.thinking=§e思考中... Tokens: %d §n§l查看思考内容§r                
+command.serverlocalizer.translate.failed=§c翻译失败
+command.serverlocalizer.translate.failed_with_error=§c翻译失败: %s
+command.serverlocalizer.translate.failed_with_id=§c翻译失败 (ID: %s): %s
+command.serverlocalizer.translate.api_key_empty=§r§c密钥为空，请打开模组配置页面，配置ApiKey！
+command.serverlocalizer.translate.api_error=翻译过程中发生错误: %s
+

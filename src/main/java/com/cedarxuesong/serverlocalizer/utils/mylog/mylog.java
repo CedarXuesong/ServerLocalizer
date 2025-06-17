@@ -10,7 +10,7 @@ public class mylog {
         if (com.cedarxuesong.serverlocalizer.utils.ai.ModConfig.getInstance().isDebugWindowEnabled()) {
             SwingUtilities.invokeLater(() -> {
                 synchronized (lock) {
-                    DebugWindow.init();
+            DebugWindow.init();
                     windowInitialized = true;
                     lock.notifyAll();
                 }
@@ -24,7 +24,7 @@ public class mylog {
             }
         }
     }
-
+    
     public static void waitForDebugWindow() {
         if (!com.cedarxuesong.serverlocalizer.utils.ai.ModConfig.getInstance().isDebugWindowEnabled()) {
             return;
@@ -32,26 +32,26 @@ public class mylog {
         
         synchronized (lock) {
             while (!windowInitialized) {
-                try {
+            try {
                     lock.wait(5000); // Wait for 5 seconds max
                     if (!windowInitialized) {
                         System.err.println("[mylog] 等待调试窗口初始化超时");
                         break;
                     }
-                } catch (InterruptedException e) {
+            } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     System.err.println("[mylog] 等待调试窗口时被中断");
-                    break;
-                }
+                break;
             }
         }
-    }
-
-    public static void log(String tag, String message) {
-        if (com.cedarxuesong.serverlocalizer.utils.ai.ModConfig.getInstance().isDebugWindowEnabled()) {
-            DebugWindow.addLog(tag, message, DebugWindow.LogLevel.INFO);
         }
     }
+    
+    public static void log(String tag, String message) {
+        if (com.cedarxuesong.serverlocalizer.utils.ai.ModConfig.getInstance().isDebugWindowEnabled()) {
+                DebugWindow.addLog(tag, message, DebugWindow.LogLevel.INFO);
+            }
+        }
 
     public static void error(String tag, String message, Throwable e) {
         if (com.cedarxuesong.serverlocalizer.utils.ai.ModConfig.getInstance().isDebugWindowEnabled()) {
@@ -65,7 +65,7 @@ public class mylog {
 
     public static void error(String tag, String message) {
         error(tag, message, null);
-    }
+        }
     
     public static void warn(String tag, String message) {
         if (com.cedarxuesong.serverlocalizer.utils.ai.ModConfig.getInstance().isDebugWindowEnabled()) {
