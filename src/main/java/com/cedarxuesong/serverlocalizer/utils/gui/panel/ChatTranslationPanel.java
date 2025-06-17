@@ -137,13 +137,13 @@ public class ChatTranslationPanel extends BasePanel {
 
     @Override
     public void addTooltips(int mouseX, int mouseY, int localMouseY) {
-        if (isMouseOver(this.chatTranslationToggle, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.chat.tooltip.enable").split("\n")), mouseX, mouseY);
-        if (isMouseOver(this.streamToggle, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.chat.tooltip.enable_stream").split("\n")), mouseX, mouseY);
-        if (isMouseOver(this.chatBaseUrlField, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.api.tooltip.base_url").split("\n")), mouseX, mouseY);
-        if (isMouseOver(this.chatApiKeyField, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.api.tooltip.api_key").split("\n")), mouseX, mouseY);
-        if (isMouseOver(this.chatModelField, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.api.tooltip.model").split("\n")), mouseX, mouseY);
-        if (isMouseOver(this.chatTemperatureField, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.api.tooltip.temperature").split("\n")), mouseX, mouseY);
-        if (isMouseOver(this.chatSystemPromptField, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.api.tooltip.system_prompt").split("\n")), mouseX, mouseY);
+        if (isMouseOver(this.chatTranslationToggle, mouseX, localMouseY)) drawHoveringText(Lang.getTranslatedLines("gui.serverlocalizer.chat.tooltip.enable"), mouseX, mouseY);
+        if (isMouseOver(this.streamToggle, mouseX, localMouseY)) drawHoveringText(Lang.getTranslatedLines("gui.serverlocalizer.chat.tooltip.enable_stream"), mouseX, mouseY);
+        if (isMouseOver(this.chatBaseUrlField, mouseX, localMouseY)) drawHoveringText(Lang.getTranslatedLines("gui.serverlocalizer.api.tooltip.base_url"), mouseX, mouseY);
+        if (isMouseOver(this.chatApiKeyField, mouseX, localMouseY)) drawHoveringText(Lang.getTranslatedLines("gui.serverlocalizer.api.tooltip.api_key"), mouseX, mouseY);
+        if (isMouseOver(this.chatModelField, mouseX, localMouseY)) drawHoveringText(Lang.getTranslatedLines("gui.serverlocalizer.api.tooltip.model"), mouseX, mouseY);
+        if (isMouseOver(this.chatTemperatureField, mouseX, localMouseY)) drawHoveringText(Lang.getTranslatedLines("gui.serverlocalizer.api.tooltip.temperature"), mouseX, mouseY);
+        if (isMouseOver(this.chatSystemPromptField, mouseX, localMouseY)) drawHoveringText(Lang.getTranslatedLines("gui.serverlocalizer.api.tooltip.system_prompt"), mouseX, mouseY);
     }
 
     @Override

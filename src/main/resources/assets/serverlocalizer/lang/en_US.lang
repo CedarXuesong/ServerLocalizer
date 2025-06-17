@@ -21,10 +21,7 @@ gui.serverlocalizer.tooltip.reset=Reset all settings on the interface to their l
 
 # Developer Options Panel
 gui.serverlocalizer.developer.debug_window=Debug Window:
-gui.serverlocalizer.developer.debug_window.tooltip.line1=§eDebug Window
-gui.serverlocalizer.developer.debug_window.tooltip.line2=If enabled, a real-time log window will be displayed
-gui.serverlocalizer.developer.debug_window.tooltip.line3=for development and troubleshooting.
-gui.serverlocalizer.developer.debug_window.tooltip.line4=§cRequires a game restart to take effect.
+gui.serverlocalizer.developer.debug_window.tooltip=§eDebug Window\n§fIf enabled, a real-time log window will be displayed\nfor development and troubleshooting.\n§cRequires a game restart to take effect.
 
 # Item Translation Panel
 gui.serverlocalizer.item.title=Item Translation
@@ -49,11 +46,11 @@ gui.serverlocalizer.api.api_key=API Key:
 gui.serverlocalizer.api.model=Model:
 gui.serverlocalizer.api.temperature=Temperature:
 gui.serverlocalizer.api.system_prompt=System Prompt:
-gui.serverlocalizer.api.tooltip.base_url=§eBase URL\nYour API server address.\n§7e.g., https://api.openai.com/v1
-gui.serverlocalizer.api.tooltip.api_key=§eAPI Key\nYour API key.\n§7e.g., sk-xxxxxxxx
-gui.serverlocalizer.api.tooltip.model=§eModel\nThe AI model to use.\n§7e.g., gpt-4o, deepseek-v3
-gui.serverlocalizer.api.tooltip.temperature=§eTemperature (0.0 - 2.0)\nControls the randomness of the generated text.\n§7Lower (e.g., 0.2) -> More stable, deterministic\n§7Higher (e.g., 0.8) -> More creative
-gui.serverlocalizer.api.tooltip.system_prompt=§eSystem Prompt (Not recommended to change)\nThe initial instruction or role given to the AI to guide its translation behavior.\nPlease modify only the corresponding language if needed.
+gui.serverlocalizer.api.tooltip.base_url=§eBase URL\n§fYour API server address.\n§7e.g., https://api.openai.com/v1
+gui.serverlocalizer.api.tooltip.api_key=§eAPI Key\n§fYour API key.\n§7e.g., sk-xxxxxxxx
+gui.serverlocalizer.api.tooltip.model=§eModel\n§fThe AI model to use.\n§7e.g., gpt-4o, deepseek-v3
+gui.serverlocalizer.api.tooltip.temperature=§eTemperature (0.0 - 2.0)\n§fControls the randomness of the generated text.\n§7Lower (e.g., 0.2) -> More stable, deterministic\n§7Higher (e.g., 0.8) -> More creative
+gui.serverlocalizer.api.tooltip.system_prompt=§eSystem Prompt (Not recommended to change)\n§fThe initial instruction or role given to the AI to guide its translation behavior.
 
 # Project Info Panel
 gui.serverlocalizer.project.title=ServerLocalizer

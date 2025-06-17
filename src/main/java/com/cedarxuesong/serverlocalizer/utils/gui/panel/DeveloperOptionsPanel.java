@@ -66,12 +66,7 @@ public class DeveloperOptionsPanel extends BasePanel {
     public void addTooltips(int mouseX, int guiMouseY, int localMouseY) {
         if (debugWindowToggle.isMouseOver()) {
             if (parent instanceof ConfigGui) {
-                ((ConfigGui) parent).drawPublicHoveringText(Arrays.asList(
-                    Lang.translate("gui.serverlocalizer.developer.debug_window.tooltip.line1"),
-                    Lang.translate("gui.serverlocalizer.developer.debug_window.tooltip.line2"),
-                    Lang.translate("gui.serverlocalizer.developer.debug_window.tooltip.line3"),
-                    Lang.translate("gui.serverlocalizer.developer.debug_window.tooltip.line4")
-                ), mouseX, guiMouseY);
+                ((ConfigGui) parent).drawPublicHoveringText(Lang.getTranslatedLines("gui.serverlocalizer.developer.debug_window.tooltip"), mouseX, guiMouseY);
             }
         }
     }

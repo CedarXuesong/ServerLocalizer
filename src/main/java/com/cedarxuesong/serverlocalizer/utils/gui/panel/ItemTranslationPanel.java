@@ -151,14 +151,14 @@ public class ItemTranslationPanel extends BasePanel {
 
     @Override
     public void addTooltips(int mouseX, int mouseY, int localMouseY) {
-        if (isMouseOver(this.itemTranslationToggle, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.item.tooltip.enable").split("\n")), mouseX, mouseY);
-        if (isMouseOver(this.itemBaseUrlField, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.api.tooltip.base_url").split("\n")), mouseX, mouseY);
-        if (isMouseOver(this.itemApiKeyField, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.api.tooltip.api_key").split("\n")), mouseX, mouseY);
-        if (isMouseOver(this.itemModelField, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.api.tooltip.model").split("\n")), mouseX, mouseY);
-        if (isMouseOver(this.itemTemperatureField, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.api.tooltip.temperature").split("\n")), mouseX, mouseY);
-        if (isMouseOver(this.itemSystemPromptField, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.api.tooltip.system_prompt").split("\n")), mouseX, mouseY);
-        if (isMouseOver(this.itemNameToggle, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.item.tooltip.enable_name").split("\n")), mouseX, mouseY);
-        if (isMouseOver(this.itemLoreToggle, mouseX, localMouseY)) drawHoveringText(Arrays.asList(Lang.translate("gui.serverlocalizer.item.tooltip.enable_lore").split("\n")), mouseX, mouseY);
+        if (isMouseOver(this.itemTranslationToggle, mouseX, localMouseY)) drawHoveringText(Lang.getTranslatedLines("gui.serverlocalizer.item.tooltip.enable"), mouseX, mouseY);
+        if (isMouseOver(this.itemBaseUrlField, mouseX, localMouseY)) drawHoveringText(Lang.getTranslatedLines("gui.serverlocalizer.api.tooltip.base_url"), mouseX, mouseY);
+        if (isMouseOver(this.itemApiKeyField, mouseX, localMouseY)) drawHoveringText(Lang.getTranslatedLines("gui.serverlocalizer.api.tooltip.api_key"), mouseX, mouseY);
+        if (isMouseOver(this.itemModelField, mouseX, localMouseY)) drawHoveringText(Lang.getTranslatedLines("gui.serverlocalizer.api.tooltip.model"), mouseX, mouseY);
+        if (isMouseOver(this.itemTemperatureField, mouseX, localMouseY)) drawHoveringText(Lang.getTranslatedLines("gui.serverlocalizer.api.tooltip.temperature"), mouseX, mouseY);
+        if (isMouseOver(this.itemSystemPromptField, mouseX, localMouseY)) drawHoveringText(Lang.getTranslatedLines("gui.serverlocalizer.api.tooltip.system_prompt"), mouseX, mouseY);
+        if (isMouseOver(this.itemNameToggle, mouseX, localMouseY)) drawHoveringText(Lang.getTranslatedLines("gui.serverlocalizer.item.tooltip.enable_name"), mouseX, mouseY);
+        if (isMouseOver(this.itemLoreToggle, mouseX, localMouseY)) drawHoveringText(Lang.getTranslatedLines("gui.serverlocalizer.item.tooltip.enable_lore"), mouseX, mouseY);
     }
 
     @Override

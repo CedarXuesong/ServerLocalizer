@@ -21,10 +21,7 @@ gui.serverlocalizer.tooltip.reset=将界面中的所有设置恢复为上次保�
 
 # Developer Options Panel
 gui.serverlocalizer.developer.debug_window=调试窗口:
-gui.serverlocalizer.developer.debug_window.tooltip.line1=§e调试窗口
-gui.serverlocalizer.developer.debug_window.tooltip.line2=开启后将显示一个实时日志窗口，
-gui.serverlocalizer.developer.debug_window.tooltip.line3=用于开发和问题排查。
-gui.serverlocalizer.developer.debug_window.tooltip.line4=§c需要重启游戏才能生效。
+gui.serverlocalizer.developer.debug_window.tooltip=§e调试窗口\n§f开启后将显示一个实时日志窗口，\n用于开发和问题排查。\n§c需要重启游戏才能生效。
 
 # Item Translation Panel
 gui.serverlocalizer.item.title=物品翻译
@@ -49,11 +46,11 @@ gui.serverlocalizer.api.api_key=API密钥:
 gui.serverlocalizer.api.model=模型:
 gui.serverlocalizer.api.temperature=温度:
 gui.serverlocalizer.api.system_prompt=系统提示词:
-gui.serverlocalizer.api.tooltip.base_url=§eAPI地址\n你的API服务器地址。\n§7例如: https://api.openai.com/v1
-gui.serverlocalizer.api.tooltip.api_key=§eAPI密钥\n你的API密钥。\n§7例如: sk-xxxxxxxx
-gui.serverlocalizer.api.tooltip.model=§e模型\n所使用的AI模型。\n§7例如: gpt-4o, deepseek-v3
-gui.serverlocalizer.api.tooltip.temperature=§e温度 (0.0 - 2.0)\n控制生成文本的随机性。\n§7较低值 (如0.2) -> 更稳定、确定\n§7较高值 (如0.8) -> 更具创造性
-gui.serverlocalizer.api.tooltip.system_prompt=§e系统提示词 (不建议修改)\n给AI设定的初始指令或角色，用于指导其翻译行为。\n如需要请仅修改对应语言。
+gui.serverlocalizer.api.tooltip.base_url=§eAPI地址\n§f你的API服务器地址。\n§7例如: https://api.openai.com/v1
+gui.serverlocalizer.api.tooltip.api_key=§eAPI密钥\n§f你的API密钥。\n§7例如: sk-xxxxxxxx
+gui.serverlocalizer.api.tooltip.model=§e模型\n§f所使用的AI模型。\n§7例如: gpt-4o, deepseek-v3
+gui.serverlocalizer.api.tooltip.temperature=§e温度 (0.0 - 2.0)\n§f控制生成文本的随机性。\n§7较低值 (如0.2) -> 更稳定、确定\n§7较高值 (如0.8) -> 更具创造性
+gui.serverlocalizer.api.tooltip.system_prompt=§e系统提示词 (不建议修改)\n§f给AI设定的初始指令或角色，用于指导其翻译行为。
 
 # Project Info Panel
 gui.serverlocalizer.project.title=ServerLocalizer
