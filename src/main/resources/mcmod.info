@@ -1,0 +1,16 @@
+[
+{
+  "modid": "serverlocalizer",
+  "name": "CedarServerLocalizer",
+  "description": "一个强大的 Minecraft 服务器内容本地化翻译模组，让您轻松畅玩国际服务器！",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://github.com/CedarXuesong/ServerLocalizer",
+  "updateUrl": "https://github.com/CedarXuesong/ServerLocalizer/releases",
+  "authorList": ["CedarXuesong"],
+  "credits": "Minecraft Forge, SpongePowered Mixin, and all contributors.",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
