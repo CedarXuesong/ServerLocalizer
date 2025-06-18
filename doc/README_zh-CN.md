@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="favicon.ico" alt="Logo" width="128" height="128">
+</div>
+
 # 🌐 ServerLocalizer
 
 [![Minecraft](https://img.shields.io/badge/Minecraft-1.8.9-brightgreen.svg)](https://minecraft.net)
