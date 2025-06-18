@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="favicon.ico" alt="Logo" width="128" height="128">
+  <img src="icon-512x512.png" alt="Logo" width="128" height="128">
 </div>
 
 # 🌐 ServerLocalizer
