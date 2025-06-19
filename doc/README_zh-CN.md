@@ -46,7 +46,7 @@ ServerLocalizer 是一个专为 Minecraft 1.8.9 开发的 Forge 模组，通过�
 
 1. **打开配置**:
    - 在主菜单或暂停菜单点击 **"模组"** -> 找到 **"ServerLocalizer"** -> 点击 **"配置"** 按钮。
-   - 或在游戏中输入命令 `/sl config`。
+   - 或在游戏中输入命令 `/serverlocalizer config`。
 2. **配置API**:
    - 在 **"物品翻译"** 和 **"聊天翻译"** 标签页中，填入您的API服务地址（Base URL）、API 密钥（API Key）和模型名称（Model）。
    - 本模组兼容所有符合 OpenAI API 接口标准的模型服务。
@@ -60,10 +60,10 @@ ServerLocalizer 是一个专为 Minecraft 1.8.9 开发的 Forge 模组，通过�
 
 ## ⌨️ 命令列表
 
-主命令为 `/serverlocalizer`，可缩写为 `/sl`。
+主命令为 `/serverlocalizer`。
 
-- `/sl config`: 打开模组的图形化配置界面。
-- `/sl translate <messageId>`: 翻译指定ID的聊天消息（主要由内部点击调用）。
+- `/serverlocalizer config`: 打开模组的图形化配置界面。
+- `/serverlocalizer translate <messageId>`: 翻译指定ID的聊天消息（主要由内部点击调用）。
 
 ## 📂 配置文件
 

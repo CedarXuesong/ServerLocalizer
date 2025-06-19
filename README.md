@@ -46,7 +46,7 @@ ServerLocalizer is a Forge mod for Minecraft 1.8.9 that provides high-quality, c
 
 1. **Open Configuration**:
    - From the main menu or pause menu, click **"Mods"** -> find **"ServerLocalizer"** -> click the **"Config"** button.
-   - Alternatively, use the in-game command `/sl config`.
+   - Alternatively, use the in-game command `/serverlocalizer  config`.
 2. **Configure API**:
    - In the **"Item Translation"** and **"Chat Translation"** tabs, enter your API service address (Base URL), API Key, and Model name.
    - This mod is compatible with any model service that adheres to the OpenAI API standards.
@@ -60,10 +60,10 @@ ServerLocalizer is a Forge mod for Minecraft 1.8.9 that provides high-quality, c
 
 ## ⌨️ Command List
 
-The main command is `/serverlocalizer`, which can be shortened to `/sl`.
+The main command is `/serverlocalizer`.
 
-- `/sl config`: Opens the mod's graphical configuration interface.
-- `/sl translate <messageId>`: Translates a chat message with a specific ID (mainly used internally by clicks).
+- `/serverlocalizer config`: Opens the mod's graphical configuration interface.
+- `/serverlocalizer translate <messageId>`: Translates a chat message with a specific ID (mainly used internally by clicks).
 
 ## 📂 Configuration Files
 
