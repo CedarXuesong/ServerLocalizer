@@ -17,6 +17,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.event.HoverEvent;
+import net.minecraft.util.ChatComponentTranslation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -249,25 +250,23 @@ public class ChatTranslateCommand extends CommandBase {
                 translationExecutor.submit(() -> {
                     try {
                         OpenAIResponse response = translateTextWithUsage(originalText);
-                        String translatedText = Lang.translate("command.serverlocalizer.translate.failed");
-                        Usage usage = null;
+                        IChatComponent translatedMessage;
 
                         if (response.isSuccess()) {
-                            translatedText = cleanTranslationOutput(response.extractMessageContent());
-                            usage = response.getUsage();
+                            String translatedText = cleanTranslationOutput(response.extractMessageContent());
+                            Usage usage = response.getUsage();
+                            translatedMessage = new ChatComponentText(translatedText);
+                            translatedMessage.getChatStyle().setColor(EnumChatFormatting.GREEN);
+
+                            if (usage != null) {
+                                IChatComponent hoverText = new ChatComponentText(usage.toString());
+                                HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText);
+                                translatedMessage.getChatStyle().setChatHoverEvent(hoverEvent);
+                            }
                         } else {
-                            translatedText = String.format(Lang.translate("command.serverlocalizer.translate.failed_with_error"), response.getError());
+                            translatedMessage = new ChatComponentTranslation("command.serverlocalizer.translate.failed_with_error", response.getError());
                         }
 
-                        IChatComponent translatedMessage = new ChatComponentText(translatedText);
-                        translatedMessage.getChatStyle().setColor(EnumChatFormatting.GREEN);
-
-                        if (usage != null) {
-                            IChatComponent hoverText = new ChatComponentText(usage.toString());
-                            HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText);
-                            translatedMessage.getChatStyle().setChatHoverEvent(hoverEvent);
-                        }
-                        
                         final IChatComponent finalTranslatedMessage = translatedMessage;
                         mc.addScheduledTask(() -> {
                             IChatComponent currentLoadingMessage = messageComponentToReplaceMap.get(messageId);
@@ -333,15 +332,15 @@ public class ChatTranslateCommand extends CommandBase {
                             isThinking[0] = true;
                         }
                         // 更新思考中的Token计数
-                        String thinkingText = String.format(Lang.translate("command.serverlocalizer.translate.thinking"), fullText.length());
-                        newComp = new ChatComponentText(thinkingText);
-
-                        // 提取思考内容并创建悬浮事件
                         String thinkingContent = "";
                         int thinkStartIndex = currentFullText.indexOf("<think>");
                         if (thinkStartIndex != -1) {
                             thinkingContent = currentFullText.substring(thinkStartIndex + "<think>".length());
                         }
+
+                        newComp = new ChatComponentTranslation("command.serverlocalizer.translate.thinking", thinkingContent.length());
+
+                        // 提取思考内容并创建悬浮事件
                         IChatComponent hoverTextComponent = new ChatComponentText(thinkingContent);
                         HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverTextComponent);
                         newComp.getChatStyle().setChatHoverEvent(hoverEvent);
@@ -405,14 +404,14 @@ public class ChatTranslateCommand extends CommandBase {
     private void handleTranslationError(String messageId, String errorMessageStr, IChatComponent componentToReplace) {
         Minecraft.getMinecraft().addScheduledTask(() -> {
             if (componentToReplace != null) {
-                IChatComponent errorMessage = new ChatComponentText(String.format(Lang.translate("command.serverlocalizer.translate.failed_with_error"), errorMessageStr));
+                IChatComponent errorMessage = new ChatComponentTranslation("command.serverlocalizer.translate.failed_with_error", errorMessageStr);
                 
                 if (replaceMessageInChatLines(Minecraft.getMinecraft().ingameGUI.getChatGUI(), componentToReplace, errorMessage)) {
                     refreshChatWithScroll(Minecraft.getMinecraft().ingameGUI.getChatGUI());
                 }
             } else {
                  // 如果找不到要替换的组件，直接打印错误信息
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(String.format(Lang.translate("command.serverlocalizer.translate.failed_with_id"), messageId, errorMessageStr)));
+                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentTranslation("command.serverlocalizer.translate.failed_with_id", messageId, errorMessageStr));
             }
             translatingMessages.remove(messageId);
             messageComponentToReplaceMap.remove(messageId);
