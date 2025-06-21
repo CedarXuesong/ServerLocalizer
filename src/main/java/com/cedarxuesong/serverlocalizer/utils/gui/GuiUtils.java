@@ -1,12 +1,18 @@
 package com.cedarxuesong.serverlocalizer.utils.gui;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 /**
  * GUI 绘图工具类
  */
 public class GuiUtils {
+
+    private static final ResourceLocation SHADOW_TEXTURE = new ResourceLocation("serverlocalizer", "textures/gui/shadow.png");
 
     /**
      * Calculates a point on a cubic Bézier curve.
@@ -126,5 +132,70 @@ public class GuiUtils {
             endX = i;
         }
         net.minecraft.client.gui.Gui.drawRect(startX, y, endX, y + 1, color);
+    }
+
+    /**
+     * Draws a textured rectangle with custom dimensions. This is a custom implementation
+     * that uses double-precision floating-point numbers for coordinates for higher precision.
+     *
+     * @param x x-coordinate to draw at
+     * @param y y-coordinate to draw at
+     * @param u u-coordinate on the texture
+     * @param v v-coordinate on the texture
+     * @param width width of the rectangle
+     * @param height height of the rectangle
+     * @param textureWidth total width of the texture
+     * @param textureHeight total height of the texture
+     */
+    public static void drawModalRectWithCustomSizedTexture(double x, double y, float u, float v, double width, double height, float textureWidth, float textureHeight) {
+        float f = 1.0F / textureWidth;
+        float f1 = 1.0F / textureHeight;
+        Tessellator tessellator = Tessellator.getInstance();
+        net.minecraft.client.renderer.WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        worldrenderer.begin(7, net.minecraft.client.renderer.vertex.DefaultVertexFormats.POSITION_TEX);
+        worldrenderer.pos(x, y + height, 0.0D).tex((double)(u * f), (double)((v + (float)height) * f1)).endVertex();
+        worldrenderer.pos(x + width, y + height, 0.0D).tex((double)((u + (float)width) * f), (double)((v + (float)height) * f1)).endVertex();
+        worldrenderer.pos(x + width, y, 0.0D).tex((double)((u + (float)width) * f), (double)(v * f1)).endVertex();
+        worldrenderer.pos(x, y, 0.0D).tex((double)(u * f), (double)(v * f1)).endVertex();
+        tessellator.draw();
+    }
+
+    /**
+     * Draws a 9-sliced shadow texture around a rectangle.
+     * @param x x-coordinate of the rect
+     * @param y y-coordinate of the rect
+     * @param width width of the rect
+     * @param height height of the rect
+     * @param shadowWidth the width of the shadow border
+     */
+    public static void drawShadow(float x, float y, float width, float height, float shadowWidth) {
+        Minecraft.getMinecraft().getTextureManager().bindTexture(SHADOW_TEXTURE);
+        GlStateManager.enableBlend();
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        // Reset color to neutral (white, opaque) to ensure the texture's own colors and alpha are used without modulation.
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+
+        // Draw the shadow twice to make it darker and more prominent
+        drawShadowLayer(x, y, width, height, shadowWidth);
+        drawShadowLayer(x, y, width, height, shadowWidth);
+
+        GlStateManager.disableBlend();
+    }
+
+    private static void drawShadowLayer(float x, float y, float width, float height, float shadowWidth) {
+        float texSize = 256.0f; // Size of the shadow texture
+        float corner = shadowWidth;
+
+        // Draw corners
+        drawModalRectWithCustomSizedTexture(x - shadowWidth, y - shadowWidth, 0, 0, corner, corner, texSize, texSize); // Top-left
+        drawModalRectWithCustomSizedTexture(x + width, y - shadowWidth, texSize - corner, 0, corner, corner, texSize, texSize); // Top-right
+        drawModalRectWithCustomSizedTexture(x - shadowWidth, y + height, 0, texSize - corner, corner, corner, texSize, texSize); // Bottom-left
+        drawModalRectWithCustomSizedTexture(x + width, y + height, texSize - corner, texSize - corner, corner, corner, texSize, texSize); // Bottom-right
+
+        // Draw edges
+        drawModalRectWithCustomSizedTexture(x, y - shadowWidth, corner, 0, width, corner, texSize, texSize); // Top
+        drawModalRectWithCustomSizedTexture(x, y + height, corner, texSize - corner, width, corner, texSize, texSize); // Bottom
+        drawModalRectWithCustomSizedTexture(x - shadowWidth, y, 0, corner, corner, height, texSize, texSize); // Left
+        drawModalRectWithCustomSizedTexture(x + width, y, texSize - corner, corner, corner, height, texSize, texSize); // Right
     }
 } 

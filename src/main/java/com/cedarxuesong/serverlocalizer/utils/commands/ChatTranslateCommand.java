@@ -256,17 +256,17 @@ public class ChatTranslateCommand extends CommandBase {
                             String translatedText = cleanTranslationOutput(response.extractMessageContent());
                             Usage usage = response.getUsage();
                             translatedMessage = new ChatComponentText(translatedText);
-                            translatedMessage.getChatStyle().setColor(EnumChatFormatting.GREEN);
+                        translatedMessage.getChatStyle().setColor(EnumChatFormatting.GREEN);
 
-                            if (usage != null) {
-                                IChatComponent hoverText = new ChatComponentText(usage.toString());
-                                HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText);
-                                translatedMessage.getChatStyle().setChatHoverEvent(hoverEvent);
+                        if (usage != null) {
+                            IChatComponent hoverText = new ChatComponentText(usage.toString());
+                            HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText);
+                            translatedMessage.getChatStyle().setChatHoverEvent(hoverEvent);
                             }
                         } else {
                             translatedMessage = new ChatComponentTranslation("command.serverlocalizer.translate.failed_with_error", response.getError());
                         }
-
+                        
                         final IChatComponent finalTranslatedMessage = translatedMessage;
                         mc.addScheduledTask(() -> {
                             IChatComponent currentLoadingMessage = messageComponentToReplaceMap.get(messageId);
