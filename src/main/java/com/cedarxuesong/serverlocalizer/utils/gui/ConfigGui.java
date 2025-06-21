@@ -7,6 +7,7 @@ import com.cedarxuesong.serverlocalizer.utils.gui.panel.DeveloperOptionsPanel;
 import com.cedarxuesong.serverlocalizer.utils.gui.panel.ItemTranslationPanel;
 import com.cedarxuesong.serverlocalizer.utils.gui.panel.ProjectInfoPanel;
 import com.cedarxuesong.serverlocalizer.utils.Lang;
+import com.cedarxuesong.serverlocalizer.utils.gui.render.BlurUtils;
 import com.cedarxuesong.serverlocalizer.utils.mylog.mylog;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
@@ -30,7 +31,7 @@ public class ConfigGui extends GuiScreen {
     
     // --- Theming ---
     public static final int COLOR_BACKGROUND = 0xFF202225;
-    public static final int COLOR_PANEL_BACKGROUND = 0xFF2F3136;
+    public static final int COLOR_PANEL_BACKGROUND = 0xE02F3136; // Made panel background semi-transparent
     public static final int COLOR_TEXT_WHITE = 0xFFFFFFFF;
     public static final int COLOR_TEXT_HEADER = 0xFFFFFFFF;
     public static final int COLOR_TEXT_LABEL = 0xFF8E9297;
@@ -45,6 +46,10 @@ public class ConfigGui extends GuiScreen {
     private boolean isDragging = false;
     private int lastMouseY = 0;
     private long lastFrameTime = 0L;
+
+    // Blur animation
+    private float blurStrength = 0.0f;
+    private final float targetBlurStrength = 100.0f;
     
     // Category selection indicator animation
     // 分类选择指示器动画
@@ -89,6 +94,7 @@ public class ConfigGui extends GuiScreen {
     private BasePanel currentPanel;
     
     private final GuiScreen parentScreen;
+    private final BlurUtils blurUtils = new BlurUtils();
     
     public ConfigGui(GuiScreen parentScreen) {
         this.parentScreen = parentScreen;
@@ -107,7 +113,9 @@ public class ConfigGui extends GuiScreen {
     @Override
     public void initGui() {
         mylog.log(TAG, "ConfigGui 开始初始化 (initGui)...");
+        this.blurUtils.init();
         super.initGui();
+        this.blurStrength = 0.0f; // Start animation from 0 every time
         this.lastFrameTime = System.currentTimeMillis();
         this.buttonList.clear();
         
@@ -189,6 +197,13 @@ public class ConfigGui extends GuiScreen {
         double k = 0.02; // 动画平滑系数，值越小动画越慢
         float amountToMove = (float) (1.0 - Math.exp(-k * deltaTime));
 
+        // Blur animation
+        if (Math.abs(targetBlurStrength - blurStrength) > 0.1f) {
+            blurStrength += (targetBlurStrength - blurStrength) * amountToMove;
+        } else {
+            blurStrength = targetBlurStrength;
+        }
+
         // 滚动动画
         if (Math.abs(targetScrollOffset - scrollOffset) > 0.1f) {
             scrollOffset += (targetScrollOffset - scrollOffset) * amountToMove;
@@ -229,7 +244,7 @@ public class ConfigGui extends GuiScreen {
     
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        drawRect(0, 0, this.width, this.height, COLOR_BACKGROUND);
+        this.blurUtils.blur((int)this.blurStrength); // Apply blur effect with animation
         updateAnimations();
 
         this.drawCenteredString(this.fontRendererObj, Lang.translate("gui.serverlocalizer.title"), this.width / 2, 15, COLOR_TEXT_HEADER);
@@ -238,6 +253,13 @@ public class ConfigGui extends GuiScreen {
         int panelTopMargin = 35;
         int panelBottomMargin = 40;
         
+        // Draw shadows first
+        GuiUtils.drawShadow(5, panelTopMargin, leftPanelWidth, this.height - panelTopMargin - panelBottomMargin, 10);
+        
+        int rightPanelX = leftPanelWidth + 15;
+        GuiUtils.drawShadow(rightPanelX, panelTopMargin, this.width - rightPanelX - 10, this.height - panelTopMargin - panelBottomMargin, 10);
+        
+        // Then draw panels on top
         GuiUtils.drawRoundedRect(5, panelTopMargin, leftPanelWidth, this.height - panelTopMargin - panelBottomMargin, 8, COLOR_PANEL_BACKGROUND);
         
         // 绘制分类按钮下方的选择指示器
@@ -256,7 +278,6 @@ public class ConfigGui extends GuiScreen {
             }
         }
         
-        int rightPanelX = leftPanelWidth + 15;
         GuiUtils.drawRoundedRect(rightPanelX, panelTopMargin, this.width - rightPanelX - 10, this.height - panelTopMargin - panelBottomMargin, 8, COLOR_PANEL_BACKGROUND);
         
         // --- 绘制右侧滚动面板 ---
@@ -493,6 +514,11 @@ public class ConfigGui extends GuiScreen {
     @Override
     public void onGuiClosed() {
         mylog.log(TAG, "ConfigGui 正在关闭 (onGuiClosed)...");
+        this.blurUtils.onGuiClosed();
         super.onGuiClosed();
     }
-} 
+
+    public GuiTextField getItemApiKeyField() {
+        return itemApiKeyField;
+    }
+}
