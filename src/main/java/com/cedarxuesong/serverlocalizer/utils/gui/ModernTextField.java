@@ -13,6 +13,8 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ChatAllowedCharacters;
 import net.minecraft.util.MathHelper;
 import org.lwjgl.opengl.GL11;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 public class ModernTextField extends Gui {
     private static final double ANIMATION_SPEED = 0.03;
@@ -45,6 +47,23 @@ public class ModernTextField extends Gui {
     private float cursorRenderX;
     private float targetCursorRenderX;
     private float cursorBlinkAnimation;
+
+    // Undo/Redo history
+    private final Deque<HistoryEntry> undoStack = new ArrayDeque<>();
+    private final Deque<HistoryEntry> redoStack = new ArrayDeque<>();
+    private boolean isUndoRedo = false;
+
+    private static class HistoryEntry {
+        final String text;
+        final int cursorPosition;
+        final int selectionEnd;
+
+        HistoryEntry(String text, int cursorPosition, int selectionEnd) {
+            this.text = text;
+            this.cursorPosition = cursorPosition;
+            this.selectionEnd = selectionEnd;
+        }
+    }
 
     public ModernTextField(int componentId, FontRenderer fontrendererObj, int x, int y, int par5Width, int par6Height) {
         this.id = componentId;
@@ -88,6 +107,8 @@ public class ModernTextField extends Gui {
             }
 
             this.setCursorPositionEnd();
+            this.undoStack.clear();
+            this.redoStack.clear();
         }
     }
 
@@ -106,6 +127,7 @@ public class ModernTextField extends Gui {
     }
 
     public void writeText(String textToWrite) {
+        saveStateForUndo();
         String newText = "";
         String filteredText = ChatAllowedCharacters.filterAllowedCharacters(textToWrite);
         int selectionStart = Math.min(this.cursorPosition, this.selectionEnd);
@@ -140,6 +162,7 @@ public class ModernTextField extends Gui {
             if (this.selectionEnd != this.cursorPosition) {
                 this.writeText("");
             } else {
+                saveStateForUndo();
                 this.deleteFromCursor(this.getNthWordFromCursor(numWords) - this.cursorPosition);
             }
         }
@@ -150,6 +173,7 @@ public class ModernTextField extends Gui {
             if (this.selectionEnd != this.cursorPosition) {
                 this.writeText("");
             } else {
+                saveStateForUndo();
                 boolean isDeletingBackward = numChars < 0;
                 int start = isDeletingBackward ? this.cursorPosition + numChars : this.cursorPosition;
                 int end = isDeletingBackward ? this.cursorPosition : this.cursorPosition + numChars;
@@ -258,6 +282,12 @@ public class ModernTextField extends Gui {
                 this.writeText("");
             }
 
+            return true;
+        } else if (GuiScreen.isCtrlKeyDown() && keyCode == 44) { // Ctrl+Z
+            this.undo();
+            return true;
+        } else if (GuiScreen.isCtrlKeyDown() && keyCode == 21) { // Ctrl+Y
+            this.redo();
             return true;
         } else {
             switch (keyCode) {
@@ -548,5 +578,42 @@ public class ModernTextField extends Gui {
 
     public void setVisible(boolean visible) {
         this.visible = visible;
+    }
+
+    private void saveStateForUndo() {
+        if (isUndoRedo) return;
+        // Don't save if text is identical to the last saved state.
+        if (!undoStack.isEmpty() && undoStack.peek().text.equals(this.text)) {
+            return;
+        }
+        this.undoStack.push(new HistoryEntry(this.text, this.cursorPosition, this.selectionEnd));
+        this.redoStack.clear();
+        if (this.undoStack.size() > 100) { // Limit history size
+            this.undoStack.removeLast();
+        }
+    }
+
+    private void undo() {
+        if (!undoStack.isEmpty()) {
+            this.isUndoRedo = true;
+            this.redoStack.push(new HistoryEntry(this.text, this.cursorPosition, this.selectionEnd));
+            HistoryEntry lastState = undoStack.pop();
+            this.text = lastState.text;
+            this.setCursorPosition(lastState.cursorPosition);
+            this.setSelectionPos(lastState.selectionEnd);
+            this.isUndoRedo = false;
+        }
+    }
+
+    private void redo() {
+        if (!redoStack.isEmpty()) {
+            this.isUndoRedo = true;
+            this.undoStack.push(new HistoryEntry(this.text, this.cursorPosition, this.selectionEnd));
+            HistoryEntry nextState = redoStack.pop();
+            this.text = nextState.text;
+            this.setCursorPosition(nextState.cursorPosition);
+            this.setSelectionPos(nextState.selectionEnd);
+            this.isUndoRedo = false;
+        }
     }
 } 
