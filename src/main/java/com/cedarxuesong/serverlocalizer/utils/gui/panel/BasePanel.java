@@ -2,12 +2,14 @@ package com.cedarxuesong.serverlocalizer.utils.gui.panel;
 
 import com.cedarxuesong.serverlocalizer.utils.ai.ModConfig;
 import com.cedarxuesong.serverlocalizer.utils.gui.ConfigGui;
+import com.cedarxuesong.serverlocalizer.utils.gui.ModernTextField;
+import com.cedarxuesong.serverlocalizer.utils.gui.Theme;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiTextField;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,19 +19,18 @@ import java.util.List;
  */
 public abstract class BasePanel {
 
-    protected Minecraft mc;
-    protected GuiScreen parent;
-    protected FontRenderer fontRendererObj;
-    protected ModConfig modConfig;
+    protected final GuiScreen parent;
+    protected final Minecraft mc;
+    protected final FontRenderer fontRendererObj;
+    protected final ModConfig modConfig = ModConfig.getInstance();
 
     public final List<GuiButton> buttons = new ArrayList<>();
-    public final List<GuiTextField> textFields = new ArrayList<>();
+    public final List<ModernTextField> textFields = new ArrayList<>();
 
     public BasePanel(GuiScreen parent) {
-        this.mc = Minecraft.getMinecraft();
         this.parent = parent;
+        this.mc = Minecraft.getMinecraft();
         this.fontRendererObj = this.mc.fontRendererObj;
-        this.modConfig = ModConfig.getInstance();
     }
 
     /**
@@ -84,7 +85,7 @@ public abstract class BasePanel {
      * @param keyCode 键码
      */
     public void keyTyped(char typedChar, int keyCode) throws IOException {
-        for (GuiTextField textField : this.textFields) {
+        for (ModernTextField textField : this.textFields) {
             if (textField.isFocused()) {
                 textField.textboxKeyTyped(typedChar, keyCode);
             }
@@ -98,7 +99,7 @@ public abstract class BasePanel {
      * @param mouseButton 鼠标按钮
      */
     public void mouseClicked(int mouseX, int localMouseY, int mouseButton) throws IOException {
-        for (GuiTextField textField : this.textFields) {
+        for (ModernTextField textField : this.textFields) {
             textField.mouseClicked(mouseX, localMouseY, mouseButton);
         }
     }
@@ -114,11 +115,15 @@ public abstract class BasePanel {
         return button.visible && mouseX >= button.xPosition && localMouseY >= button.yPosition && mouseX < button.xPosition + button.width && localMouseY < button.yPosition + button.height;
     }
 
-    protected boolean isMouseOver(GuiTextField field, int mouseX, int localMouseY) {
+    protected boolean isMouseOver(ModernTextField field, int mouseX, int localMouseY) {
         return field.getVisible() && mouseX >= field.xPosition && localMouseY >= field.yPosition && mouseX < field.xPosition + field.width && localMouseY < field.yPosition + field.height;
     }
     
     protected void drawString(String text, int x, int y) {
-        this.fontRendererObj.drawString(text, x, y, ConfigGui.COLOR_TEXT_LABEL);
+        this.fontRendererObj.drawString(text, x, y, Theme.COLOR_TEXT_GRAY);
+    }
+
+    protected void drawString(String text, int x, int y, int color) {
+        this.fontRendererObj.drawString(text, x, y, color);
     }
 } 

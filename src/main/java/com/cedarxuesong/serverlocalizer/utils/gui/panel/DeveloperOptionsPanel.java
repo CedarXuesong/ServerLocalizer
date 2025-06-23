@@ -2,18 +2,20 @@ package com.cedarxuesong.serverlocalizer.utils.gui.panel;
 
 import com.cedarxuesong.serverlocalizer.utils.ai.ModConfig;
 import com.cedarxuesong.serverlocalizer.utils.gui.ConfigGui;
-import com.cedarxuesong.serverlocalizer.utils.gui.ModernButton;
+import com.cedarxuesong.serverlocalizer.utils.gui.ModernSwitch;
 import com.cedarxuesong.serverlocalizer.utils.Lang;
+import com.cedarxuesong.serverlocalizer.utils.gui.Theme;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
 
 import java.util.Arrays;
 
 public class DeveloperOptionsPanel extends BasePanel {
 
-    private ModernButton debugWindowToggle;
+    private ModernSwitch debugWindowToggle;
     private final ModConfig modConfig = ModConfig.getInstance();
 
-    public DeveloperOptionsPanel(ConfigGui parent) {
+    public DeveloperOptionsPanel(GuiScreen parent) {
         super(parent);
     }
 
@@ -22,58 +24,50 @@ public class DeveloperOptionsPanel extends BasePanel {
         this.buttons.clear();
         this.textFields.clear();
 
-        debugWindowToggle = new ModernButton(400, 0, 0, 0, 20, "");
-        this.buttons.add(debugWindowToggle);
-
-        updateButtonStates();
+        this.debugWindowToggle = new ModernSwitch(10, 0, 0, modConfig::isDebugWindowEnabled, modConfig::setDebugWindowEnabled);
+        this.buttons.add(this.debugWindowToggle);
     }
 
     @Override
-    public void drawPanel(int mouseX, int mouseY, float partialTicks, int panelX, int panelY) {
-        int padding = 15;
-        int contentX = panelX + padding;
-        int y = panelY + padding;
+    public void drawPanel(int mouseX, int localMouseY, float partialTicks, int panelX, int panelY) {
+        int contentX = panelX + 15;
+        int y = panelY + 15;
+        
+        // Debug Window Toggle
+        int labelWidth = this.fontRendererObj.getStringWidth(Lang.translate("gui.serverlocalizer.developer.debug_window"));
+        int controlX = contentX + labelWidth + 15;
 
-        this.debugWindowToggle.xPosition = contentX;
+        drawString(Lang.translate("gui.serverlocalizer.developer.debug_window"), contentX, y + 6);
+        this.debugWindowToggle.xPosition = controlX;
         this.debugWindowToggle.yPosition = y;
     }
 
     @Override
-    public void actionPerformed(GuiButton button) {
-        if (button.id == 400) {
-            modConfig.setDebugWindowEnabled(!modConfig.isDebugWindowEnabled());
-            updateButtonStates();
-        }
-    }
-
-    @Override
-    public void saveConfig() {
-        // 设置通过ModConfig实例直接保存，此处无需特定操作
-    }
-
-    @Override
-    public void resetConfig() {
-        // 如有需要，可在此实现重置为默认值的功能
-        updateButtonStates();
-    }
-
-    @Override
-    public int getContentHeight() {
-        return 50; // 按需调整
-    }
-
-    @Override
-    public void addTooltips(int mouseX, int guiMouseY, int localMouseY) {
-        if (debugWindowToggle.isMouseOver()) {
+    public void addTooltips(int mouseX, int mouseY, int localMouseY) {
+        if (isMouseOver(this.debugWindowToggle, mouseX, localMouseY)) {
             if (parent instanceof ConfigGui) {
-                ((ConfigGui) parent).drawPublicHoveringText(Lang.getTranslatedLines("gui.serverlocalizer.developer.debug_window.tooltip"), mouseX, guiMouseY);
+                ((ConfigGui) parent).drawPublicHoveringText(Lang.getTranslatedLines("gui.serverlocalizer.developer.debug_window.tooltip"), mouseX, mouseY);
             }
         }
     }
 
-    private void updateButtonStates() {
-        boolean enabled = modConfig.isDebugWindowEnabled();
-        debugWindowToggle.displayString = Lang.translate("gui.serverlocalizer.developer.debug_window") + (enabled ? "§a" + Lang.translate("options.on") : "§c" + Lang.translate("options.off"));
-        debugWindowToggle.width = this.fontRendererObj.getStringWidth(debugWindowToggle.displayString) + 20;
+    @Override
+    public int getContentHeight() {
+        return 50;
+    }
+
+    @Override
+    public void saveConfig() {
+        // The switch now directly modifies the config state, so no action is needed here.
+    }
+
+    @Override
+    public void resetConfig() {
+        // The switch's state is directly bound to the config, so no action is needed here.
+    }
+
+    @Override
+    public void actionPerformed(GuiButton button) {
+        // The switch handles its own state change, so no action is needed here.
     }
 }

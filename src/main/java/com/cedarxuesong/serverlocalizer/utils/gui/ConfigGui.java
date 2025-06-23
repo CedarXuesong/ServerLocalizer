@@ -7,7 +7,6 @@ import com.cedarxuesong.serverlocalizer.utils.gui.panel.DeveloperOptionsPanel;
 import com.cedarxuesong.serverlocalizer.utils.gui.panel.ItemTranslationPanel;
 import com.cedarxuesong.serverlocalizer.utils.gui.panel.ProjectInfoPanel;
 import com.cedarxuesong.serverlocalizer.utils.Lang;
-import com.cedarxuesong.serverlocalizer.utils.gui.render.BlurUtils;
 import com.cedarxuesong.serverlocalizer.utils.mylog.mylog;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
@@ -18,6 +17,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,27 +29,48 @@ import java.util.List;
 public class ConfigGui extends GuiScreen {
     private static final String TAG = "ConfigGui";
     
+    // --- Animation Speeds ---
+    private static final double ANIMATION_SPEED_DEFAULT = 0.015;
+    
     // --- Theming ---
     public static final int COLOR_BACKGROUND = 0xFF202225;
-    public static final int COLOR_PANEL_BACKGROUND = 0xE02F3136; // Made panel background semi-transparent
+    public static final int COLOR_PANEL_BACKGROUND = 0xFF2F3136;
     public static final int COLOR_TEXT_WHITE = 0xFFFFFFFF;
     public static final int COLOR_TEXT_HEADER = 0xFFFFFFFF;
     public static final int COLOR_TEXT_LABEL = 0xFF8E9297;
     public static final int COLOR_TEXT_HIGHLIGHT = 0xFFF9A825;
     public static final int COLOR_SCROLLBAR_BG = 0x50000000;
     public static final int COLOR_SCROLLBAR_HANDLE = 0x80FFFFFF;
+    public static final int COLOR_SCROLLBAR_HANDLE_HOVER = new Color(136, 136, 136, 226).getRGB();
     
     // 滚动相关
     private float scrollOffset = 0.0f;
     private float targetScrollOffset = 0.0f;
     private float maxScrollOffset = 0.0f;
-    private boolean isDragging = false;
-    private int lastMouseY = 0;
+    private boolean isDraggingScrollbar = false;
+    private int scrollbarDragStartY = 0;
+    private float scrollbarDragStartOffset = 0.0f;
+    private boolean isScrollbarHovered = false;
     private long lastFrameTime = 0L;
+    
+    // 惯性滚动与回弹物理模拟
+    private float scrollVelocity = 0.0f;
+    private final List<long[]> dragVelocityTracker = new ArrayList<>(); // [timestamp, mouseY]
+    private static final float FRICTION = 0.96f;
+    private static final float MOUSE_WHEEL_SCROLL_AMOUNT = 20.0f;
+    private static final float FLING_VELOCITY_SCALE = 1.0f;
 
-    // Blur animation
-    private float blurStrength = 0.0f;
-    private final float targetBlurStrength = 100.0f;
+    // 滚动条滑块动画
+    private float scrollbarHandleWidth;
+    private float targetScrollbarHandleWidth;
+    private float scrollbarHandleHeight;
+    private float targetScrollbarHandleHeight;
+    
+    // 滚动条常量
+    private static final int SCROLLBAR_WIDTH_NORMAL = 6;
+    private static final int SCROLLBAR_WIDTH_DRAGGING = 10;
+    private static final int SCROLLBAR_HEIGHT_GROWTH = 4;
+    private static final int SCROLLBAR_PADDING = 4;
     
     // Category selection indicator animation
     // 分类选择指示器动画
@@ -94,7 +115,6 @@ public class ConfigGui extends GuiScreen {
     private BasePanel currentPanel;
     
     private final GuiScreen parentScreen;
-    private final BlurUtils blurUtils = new BlurUtils();
     
     public ConfigGui(GuiScreen parentScreen) {
         this.parentScreen = parentScreen;
@@ -113,11 +133,12 @@ public class ConfigGui extends GuiScreen {
     @Override
     public void initGui() {
         mylog.log(TAG, "ConfigGui 开始初始化 (initGui)...");
-        this.blurUtils.init();
         super.initGui();
-        this.blurStrength = 0.0f; // Start animation from 0 every time
         this.lastFrameTime = System.currentTimeMillis();
         this.buttonList.clear();
+        
+        this.scrollbarHandleWidth = SCROLLBAR_WIDTH_NORMAL;
+        this.targetScrollbarHandleWidth = SCROLLBAR_WIDTH_NORMAL;
         
         int leftPanelWidth = 100;
         int rightPanelX = leftPanelWidth + 20;
@@ -154,9 +175,9 @@ public class ConfigGui extends GuiScreen {
         int bottomButtonHeight = 20;
         int bottomButtonY = this.height - 30;
         int bottomButtonSpacing = 5;
-        this.resetButton = new ModernButton(102, 10, bottomButtonY, bottomButtonWidth, bottomButtonHeight, Lang.translate("gui.serverlocalizer.reset"), 0xFFB08C4A, 0xFF8C6D3A);
-        this.saveButton = new ModernButton(100, 10 + bottomButtonWidth + bottomButtonSpacing, bottomButtonY, bottomButtonWidth, bottomButtonHeight, Lang.translate("gui.serverlocalizer.save"), 0xFF558E74, 0xFF436E5A);
-        this.cancelButton = new ModernButton(101, 10 + (bottomButtonWidth + bottomButtonSpacing) * 2, bottomButtonY, bottomButtonWidth, bottomButtonHeight, Lang.translate("gui.serverlocalizer.cancel"), 0xFFB35959, 0xFF8C4545);
+        this.resetButton = new ModernButton(102, 10, bottomButtonY, bottomButtonWidth, bottomButtonHeight, Lang.translate("gui.serverlocalizer.reset"), Theme.COLOR_HIGHLIGHT_YELLOW, Theme.COLOR_HIGHLIGHT_YELLOW_HOVER);
+        this.saveButton = new ModernButton(100, 10 + bottomButtonWidth + bottomButtonSpacing, bottomButtonY, bottomButtonWidth, bottomButtonHeight, Lang.translate("gui.serverlocalizer.save"), Theme.COLOR_HIGHLIGHT_GREEN, Theme.COLOR_HIGHLIGHT_GREEN_HOVER);
+        this.cancelButton = new ModernButton(101, 10 + (bottomButtonWidth + bottomButtonSpacing) * 2, bottomButtonY, bottomButtonWidth, bottomButtonHeight, Lang.translate("gui.serverlocalizer.cancel"), Theme.COLOR_HIGHLIGHT_RED, Theme.COLOR_HIGHLIGHT_RED_HOVER);
         this.buttonList.add(this.saveButton);
         this.buttonList.add(this.cancelButton);
         this.buttonList.add(this.resetButton);
@@ -166,12 +187,50 @@ public class ConfigGui extends GuiScreen {
         updateCategoryButtonVisuals();
     }
     
+    @Override
+    public void handleKeyboardInput() throws IOException {
+        char eventChar = Keyboard.getEventCharacter();
+        int eventKey = Keyboard.getEventKey();
+
+        if ((eventKey == 0 && eventChar >= ' ') || Keyboard.getEventKeyState()) {
+            this.keyTyped(eventChar, eventKey);
+        }
+
+        this.mc.dispatchKeypresses();
+    }
+
+    @Override
+    public void updateScreen() {
+        super.updateScreen();
+        if (currentPanel != null) {
+            for (ModernTextField textField : currentPanel.textFields) {
+                textField.updateCursorCounter();
+            }
+        }
+    }
+    
     private void setCurrentPanel(int categoryIndex) {
         this.selectedCategory = categoryIndex;
         this.currentPanel = panels.get(categoryIndex);
         
         // 更新滚动范围
         calculateMaxScrollOffset();
+        this.scrollOffset = 0;
+        this.targetScrollOffset = 0;
+        this.scrollVelocity = 0;
+
+        // 初始化滑块高度
+        if (this.currentPanel != null) {
+            int contentHeight = this.currentPanel.getContentHeight();
+            int visibleHeight = this.height - 80;
+            int trackHeight = visibleHeight - (SCROLLBAR_PADDING * 2);
+            if (contentHeight > visibleHeight) {
+                float visibleRatio = (float)visibleHeight / (float)contentHeight;
+                int baseThumbHeight = Math.max(20, (int)(trackHeight * visibleRatio));
+                this.scrollbarHandleHeight = baseThumbHeight;
+                this.targetScrollbarHandleHeight = baseThumbHeight;
+            }
+        }
     }
     
     /**
@@ -185,6 +244,13 @@ public class ConfigGui extends GuiScreen {
     }
     
     /**
+     * 外部调用的滚动更新方法
+     */
+    public void updateScrolling() {
+        calculateMaxScrollOffset();
+    }
+    
+    /**
      * 更新动画
      */
     private void updateAnimations() {
@@ -194,17 +260,30 @@ public class ConfigGui extends GuiScreen {
 
         if (deltaTime > 50L) deltaTime = 50L;
         
-        double k = 0.02; // 动画平滑系数，值越小动画越慢
-        float amountToMove = (float) (1.0 - Math.exp(-k * deltaTime));
+        float amountToMove = (float) (1.0 - Math.exp(-ANIMATION_SPEED_DEFAULT * deltaTime));
 
-        // Blur animation
-        if (Math.abs(targetBlurStrength - blurStrength) > 0.1f) {
-            blurStrength += (targetBlurStrength - blurStrength) * amountToMove;
-        } else {
-            blurStrength = targetBlurStrength;
+        // --- 物理模拟 ---
+        if (!isDraggingScrollbar) {
+            // 应用速度和摩擦力
+            targetScrollOffset += scrollVelocity;
+            scrollVelocity *= FRICTION;
+            
+            // 如果速度足够小，则停止运动
+            if (Math.abs(scrollVelocity) < 0.1f) {
+                scrollVelocity = 0;
+            }
+            
+            // 检查是否越界，如果越界则吸附到边界 (无回弹)
+            if (targetScrollOffset > maxScrollOffset) {
+                targetScrollOffset = maxScrollOffset;
+                scrollVelocity = 0; // 撞墙后速度清零
+            } else if (targetScrollOffset < 0) {
+                targetScrollOffset = 0;
+                scrollVelocity = 0; // 撞墙后速度清零
+            }
         }
 
-        // 滚动动画
+        // 滚动动画 (视觉跟随物理)
         if (Math.abs(targetScrollOffset - scrollOffset) > 0.1f) {
             scrollOffset += (targetScrollOffset - scrollOffset) * amountToMove;
         } else {
@@ -219,6 +298,18 @@ public class ConfigGui extends GuiScreen {
             } else {
                 categoryIndicatorWidths[i] = targetCategoryIndicatorWidths[i];
             }
+        }
+        
+        // 滚动条滑块尺寸动画
+        if (Math.abs(targetScrollbarHandleWidth - scrollbarHandleWidth) > 0.01f) {
+            scrollbarHandleWidth += (targetScrollbarHandleWidth - scrollbarHandleWidth) * amountToMove;
+        } else {
+            scrollbarHandleWidth = targetScrollbarHandleWidth;
+        }
+        if (Math.abs(targetScrollbarHandleHeight - scrollbarHandleHeight) > 0.01f) {
+            scrollbarHandleHeight += (targetScrollbarHandleHeight - scrollbarHandleHeight) * amountToMove;
+        } else {
+            scrollbarHandleHeight = targetScrollbarHandleHeight;
         }
         
         scrollOffset = Math.max(0, Math.min(scrollOffset, maxScrollOffset));
@@ -237,35 +328,32 @@ public class ConfigGui extends GuiScreen {
         if (mouseX >= rightPanelX && mouseX < this.width - 10) {
             int dWheel = Mouse.getEventDWheel();
             if (dWheel != 0) {
-                targetScrollOffset -= (dWheel > 0 ? 20.0f : -20.0f);
+                // 停止任何现有的惯性，直接修改目标偏移量
+                this.scrollVelocity = 0;
+                this.targetScrollOffset -= (dWheel > 0 ? MOUSE_WHEEL_SCROLL_AMOUNT : -MOUSE_WHEEL_SCROLL_AMOUNT);
+                // 立即将滚动目标限制在边界内
+                this.targetScrollOffset = Math.max(0, Math.min(this.targetScrollOffset, this.maxScrollOffset));
             }
         }
     }
     
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        this.blurUtils.blur((int)this.blurStrength); // Apply blur effect with animation
+        drawRect(0, 0, this.width, this.height, Theme.COLOR_BACKGROUND);
         updateAnimations();
 
-        this.drawCenteredString(this.fontRendererObj, Lang.translate("gui.serverlocalizer.title"), this.width / 2, 15, COLOR_TEXT_HEADER);
+        this.drawCenteredString(this.fontRendererObj, Lang.translate("gui.serverlocalizer.title"), this.width / 2, 15, Theme.COLOR_TEXT_WHITE);
 
         int leftPanelWidth = 100;
         int panelTopMargin = 35;
         int panelBottomMargin = 40;
         
-        // Draw shadows first
-        GuiUtils.drawShadow(5, panelTopMargin, leftPanelWidth, this.height - panelTopMargin - panelBottomMargin, 10);
-        
-        int rightPanelX = leftPanelWidth + 15;
-        GuiUtils.drawShadow(rightPanelX, panelTopMargin, this.width - rightPanelX - 10, this.height - panelTopMargin - panelBottomMargin, 10);
-        
-        // Then draw panels on top
-        GuiUtils.drawRoundedRect(5, panelTopMargin, leftPanelWidth, this.height - panelTopMargin - panelBottomMargin, 8, COLOR_PANEL_BACKGROUND);
+        GuiUtils.drawRoundedRect(5, panelTopMargin, leftPanelWidth, this.height - panelTopMargin - panelBottomMargin, 8, Theme.COLOR_PANEL_BACKGROUND);
         
         // 绘制分类按钮下方的选择指示器
         ModernButton[] categoryButtons = {this.projectInfoButton, this.itemTranslationButton, this.chatTranslationButton, this.developerOptionsButton};
         int indicatorHeight = 2; // 指示器高度
-        int indicatorColor = 0xFF5865F2; // 指示器颜色 (蓝色)
+        int indicatorColor = Theme.COLOR_ACCENT;
 
         for (int i = 0; i < categoryButtons.length; i++) {
             ModernButton button = categoryButtons[i];
@@ -278,25 +366,13 @@ public class ConfigGui extends GuiScreen {
             }
         }
         
-        GuiUtils.drawRoundedRect(rightPanelX, panelTopMargin, this.width - rightPanelX - 10, this.height - panelTopMargin - panelBottomMargin, 8, COLOR_PANEL_BACKGROUND);
+        int rightPanelX = leftPanelWidth + 15;
+        GuiUtils.drawRoundedRect(rightPanelX, panelTopMargin, this.width - rightPanelX - 10, this.height - panelTopMargin - panelBottomMargin, 8, Theme.COLOR_PANEL_BACKGROUND);
         
         // --- 绘制右侧滚动面板 ---
+        GuiUtils.SCISSOR_STACK.push(rightPanelX, panelTopMargin, this.width - rightPanelX - 15, this.height - panelTopMargin - panelBottomMargin);
+        
         GlStateManager.pushMatrix();
-        GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        
-        int scale = this.mc.gameSettings.guiScale == 0 ? 4 : this.mc.gameSettings.guiScale;
-        int scissorX = (rightPanelX - 5);
-        int scissorY = (this.height - (this.height - panelBottomMargin));
-        int scissorWidth = (this.width - 10 - scissorX);
-        int scissorHeight = (this.height - panelTopMargin - panelBottomMargin);
-        
-        GL11.glScissor(
-            scissorX * this.mc.displayWidth / this.width,
-            scissorY * this.mc.displayHeight / this.height,
-            scissorWidth * this.mc.displayWidth / this.width,
-            scissorHeight * this.mc.displayHeight / this.height
-        );
-        
         GlStateManager.translate(0.0F, -this.scrollOffset, 0.0F);
 
         int localMouseY = mouseY + (int)this.scrollOffset;
@@ -309,16 +385,16 @@ public class ConfigGui extends GuiScreen {
             for (GuiButton button : currentPanel.buttons) {
                  button.drawButton(this.mc, mouseX, localMouseY);
             }
-            for (GuiTextField textField : currentPanel.textFields) {
-                textField.drawTextBox();
+            for (ModernTextField textField : currentPanel.textFields) {
+                textField.drawTextBox(this.scrollOffset);
             }
         }
         
         GlStateManager.popMatrix();
-        GL11.glDisable(GL11.GL_SCISSOR_TEST);
+        GuiUtils.SCISSOR_STACK.pop();
         
         if (maxScrollOffset > 0) {
-            drawScrollbar(rightPanelX, panelTopMargin, this.width - 10, this.height - panelBottomMargin);
+            drawScrollbar(mouseX, mouseY, rightPanelX, panelTopMargin, this.width - 10, this.height - panelBottomMargin);
         }
         
         // 绘制固定按钮
@@ -331,27 +407,45 @@ public class ConfigGui extends GuiScreen {
     /**
      * 绘制滚动条
      */
-    private void drawScrollbar(int panelLeft, int panelTop, int panelRight, int panelBottom) {
+    private void drawScrollbar(int mouseX, int mouseY, int panelLeft, int panelTop, int panelRight, int panelBottom) {
         if (currentPanel == null || maxScrollOffset <= 0) return;
 
-        int scrollbarWidth = 6;
-        int padding = 4; // 面板边缘的边距
+        // --- 计算滑轨和滑块基础尺寸 ---
+        int trackX = panelRight - SCROLLBAR_WIDTH_DRAGGING - SCROLLBAR_PADDING;
+        int trackY = panelTop + SCROLLBAR_PADDING;
+        int trackHeight = panelBottom - panelTop - (SCROLLBAR_PADDING * 2);
+        
+        // --- 绘制滑轨 ---
+        GuiUtils.drawRoundedRect(trackX + (SCROLLBAR_WIDTH_DRAGGING - SCROLLBAR_WIDTH_NORMAL) / 2, trackY, SCROLLBAR_WIDTH_NORMAL, trackHeight, 3, Theme.COLOR_SCROLLBAR_TRACK);
 
-        // 滚动条滑道
-        int trackX = panelRight - scrollbarWidth - padding;
-        int trackY = panelTop + padding;
-        int trackHeight = panelBottom - panelTop - (padding * 2);
-        GuiUtils.drawRoundedRect(trackX, trackY, scrollbarWidth, trackHeight, 3, COLOR_SCROLLBAR_BG);
-
-        // 滚动条滑块
+        // --- 计算滑块 ---
         float visibleRatio = (float)(panelBottom - panelTop) / (float)currentPanel.getContentHeight();
-        int thumbHeight = Math.max(20, (int)(trackHeight * visibleRatio));
-        thumbHeight = Math.min(trackHeight, thumbHeight);
+        int baseThumbHeight = Math.max(20, (int)(trackHeight * visibleRatio));
+        baseThumbHeight = Math.min(trackHeight, baseThumbHeight);
 
-        float scrollRatio = scrollOffset / maxScrollOffset;
-        int thumbY = trackY + (int) ((trackHeight - thumbHeight) * scrollRatio);
+        float scrollRatio = maxScrollOffset > 0 ? scrollOffset / maxScrollOffset : 0;
+        int thumbY = trackY + (int) ((trackHeight - baseThumbHeight) * scrollRatio);
 
-        GuiUtils.drawRoundedRect(trackX, thumbY, scrollbarWidth, thumbHeight, 3, COLOR_SCROLLBAR_HANDLE);
+        // --- 悬浮检测 ---
+        float currentHandleX = trackX + (SCROLLBAR_WIDTH_DRAGGING - scrollbarHandleWidth) / 2;
+        float currentHandleY = thumbY - (scrollbarHandleHeight - baseThumbHeight) / 2;
+        this.isScrollbarHovered = mouseX >= currentHandleX && mouseX < currentHandleX + scrollbarHandleWidth && 
+                                  mouseY >= currentHandleY && mouseY < currentHandleY + scrollbarHandleHeight;
+
+        // --- 更新动画目标 ---
+        if (this.isDraggingScrollbar) {
+            this.targetScrollbarHandleWidth = SCROLLBAR_WIDTH_DRAGGING;
+            this.targetScrollbarHandleHeight = baseThumbHeight + SCROLLBAR_HEIGHT_GROWTH;
+        } else {
+            this.targetScrollbarHandleWidth = SCROLLBAR_WIDTH_NORMAL;
+            this.targetScrollbarHandleHeight = baseThumbHeight;
+        }
+        
+        // --- 决定颜色 ---
+        int handleColor = this.isDraggingScrollbar ? Theme.COLOR_ACCENT : (this.isScrollbarHovered ? Theme.COLOR_SCROLLBAR_HANDLE_HOVER : Theme.COLOR_SCROLLBAR_HANDLE);
+        
+        // --- 绘制滑块 ---
+        GuiUtils.drawRoundedRect(currentHandleX, currentHandleY, scrollbarHandleWidth, scrollbarHandleHeight, (int)Math.floor(scrollbarHandleWidth / 2f), handleColor);
     }
     
     /**
@@ -436,12 +530,23 @@ public class ConfigGui extends GuiScreen {
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
 
+        if (mouseButton == 0 && this.isScrollbarHovered) {
+            this.isDraggingScrollbar = true;
+            this.scrollbarDragStartY = mouseY;
+            this.scrollbarDragStartOffset = this.targetScrollOffset;
+            this.scrollVelocity = 0; // "抓住"滚动条时，停止其运动
+            this.dragVelocityTracker.clear();
+            return;
+        }
+
         // 面板内点击
         int rightPanelX = 115;
         int panelTopMargin = 35;
         int panelBottomMargin = 40;
         if (mouseX >= rightPanelX - 5 && mouseX < this.width - 10 &&
             mouseY >= panelTopMargin && mouseY < this.height - panelBottomMargin && currentPanel != null) {
+            
+            if (this.isDraggingScrollbar) return;
             
             int localMouseY = mouseY + (int) scrollOffset;
             currentPanel.mouseClicked(mouseX, localMouseY, mouseButton);
@@ -452,6 +557,93 @@ public class ConfigGui extends GuiScreen {
                         this.actionPerformed(button);
                         return;
                     }
+                }
+                for (ModernTextField textField : currentPanel.textFields) {
+                    textField.mouseClicked(mouseX, localMouseY, mouseButton);
+                }
+            }
+        }
+    }
+    
+    @Override
+    protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+        if (this.isDraggingScrollbar) {
+            // 追踪拖动速度
+            this.dragVelocityTracker.add(new long[]{System.currentTimeMillis(), mouseY});
+            if (this.dragVelocityTracker.size() > 5) {
+                this.dragVelocityTracker.remove(0);
+            }
+
+            int panelTop = 35;
+            int panelBottom = this.height - 40;
+            int trackHeight = panelBottom - panelTop - (SCROLLBAR_PADDING * 2);
+
+            float visibleRatio = (float)(panelBottom - panelTop) / (float)currentPanel.getContentHeight();
+            int thumbHeight = Math.max(20, (int)(trackHeight * visibleRatio));
+            thumbHeight = Math.min(trackHeight, thumbHeight);
+            
+            float scrollableTrackHeight = trackHeight - thumbHeight;
+
+            if (scrollableTrackHeight > 1) {
+                float deltaY = mouseY - this.scrollbarDragStartY;
+                float scrollPercentDelta = deltaY / scrollableTrackHeight;
+
+                this.targetScrollOffset = this.scrollbarDragStartOffset + scrollPercentDelta * this.maxScrollOffset;
+            }
+        }
+
+        if (clickedMouseButton == 0 && currentPanel != null) {
+            int localMouseY = mouseY + (int)scrollOffset;
+            for (GuiButton button : currentPanel.buttons) {
+                if (button instanceof ModernSlider) {
+                    ModernSlider slider = (ModernSlider)button;
+                    if (slider.dragging) {
+                        slider.updateValueFromMouse(mouseX);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void mouseReleased(int mouseX, int mouseY, int state) {
+        super.mouseReleased(mouseX, mouseY, state);
+        if (state == 0) {
+            if (this.isDraggingScrollbar) {
+                this.isDraggingScrollbar = false;
+                
+                // --- 计算并应用甩动速度 ---
+                if (!this.dragVelocityTracker.isEmpty()) {
+                    long firstTimestamp = this.dragVelocityTracker.get(0)[0];
+                    long lastTimestamp = this.dragVelocityTracker.get(this.dragVelocityTracker.size() - 1)[0];
+                    long timeDelta = lastTimestamp - firstTimestamp;
+                    
+                    if (timeDelta > 10 && timeDelta < 200) { // 只在快速甩动时计算
+                        long firstY = this.dragVelocityTracker.get(0)[1];
+                        long lastY = this.dragVelocityTracker.get(this.dragVelocityTracker.size() - 1)[1];
+                        long mouseDeltaY = lastY - firstY;
+
+                        float pixelsPerMs = (float)mouseDeltaY / (float)timeDelta;
+
+                        int panelTop = 35;
+                        int panelBottom = this.height - 40;
+                        int trackHeight = panelBottom - panelTop - (SCROLLBAR_PADDING * 2);
+                        float scrollableTrackHeight = trackHeight - this.targetScrollbarHandleHeight;
+                        
+                        if (scrollableTrackHeight > 1) {
+                            float scrollUnitsPerPixel = maxScrollOffset / scrollableTrackHeight;
+                            // 1ms = 1/20tick, so multiply by 20 to get pixels/tick, then scale
+                            this.scrollVelocity = pixelsPerMs * scrollUnitsPerPixel * 20.0f * FLING_VELOCITY_SCALE;
+                        }
+                    }
+                }
+                this.dragVelocityTracker.clear();
+            }
+
+            if (currentPanel != null) {
+                int localMouseY = mouseY + (int)this.scrollOffset;
+                for (GuiButton button : currentPanel.buttons) {
+                    button.mouseReleased(mouseX, localMouseY);
                 }
             }
         }
@@ -490,10 +682,10 @@ public class ConfigGui extends GuiScreen {
         this.chatTranslationButton.displayString = Lang.translate("gui.serverlocalizer.category.chat_translation");
         this.developerOptionsButton.displayString = Lang.translate("gui.serverlocalizer.category.developer_options");
         
-        this.projectInfoButton.packedFGColour = (this.selectedCategory == 0) ? COLOR_TEXT_HIGHLIGHT : COLOR_TEXT_WHITE;
-        this.itemTranslationButton.packedFGColour = (this.selectedCategory == 1) ? COLOR_TEXT_HIGHLIGHT : COLOR_TEXT_WHITE;
-        this.chatTranslationButton.packedFGColour = (this.selectedCategory == 2) ? COLOR_TEXT_HIGHLIGHT : COLOR_TEXT_WHITE;
-        this.developerOptionsButton.packedFGColour = (this.selectedCategory == 3) ? COLOR_TEXT_HIGHLIGHT : COLOR_TEXT_WHITE;
+        this.projectInfoButton.packedFGColour = (this.selectedCategory == 0) ? Theme.COLOR_TEXT_WHITE : Theme.COLOR_TEXT_GRAY;
+        this.itemTranslationButton.packedFGColour = (this.selectedCategory == 1) ? Theme.COLOR_TEXT_WHITE : Theme.COLOR_TEXT_GRAY;
+        this.chatTranslationButton.packedFGColour = (this.selectedCategory == 2) ? Theme.COLOR_TEXT_WHITE : Theme.COLOR_TEXT_GRAY;
+        this.developerOptionsButton.packedFGColour = (this.selectedCategory == 3) ? Theme.COLOR_TEXT_WHITE : Theme.COLOR_TEXT_GRAY;
 
         // For category buttons, we use a transparent background and rely on text color and position to show selection
         this.projectInfoButton.setColors(0x00000000, 0x30FFFFFF);
@@ -514,11 +706,6 @@ public class ConfigGui extends GuiScreen {
     @Override
     public void onGuiClosed() {
         mylog.log(TAG, "ConfigGui 正在关闭 (onGuiClosed)...");
-        this.blurUtils.onGuiClosed();
         super.onGuiClosed();
     }
-
-    public GuiTextField getItemApiKeyField() {
-        return itemApiKeyField;
-    }
-}
+} 
